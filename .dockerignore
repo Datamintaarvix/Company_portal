@@ -1,0 +1,59 @@
+# ==============================================================================
+# Docker Build Context Ignore List
+# Prevents secrets, caches, virtual environments, and test files from being copied
+# into container images.
+# ==============================================================================
+
+# Git & Version Control
+.git/
+.github/
+.gitignore
+
+# Environment variables & secrets
+.env
+.env.*
+!.env.example
+!.env.staging.example
+*.pem
+*.key
+*.crt
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+
+# Python bytecode & cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+build/
+dist/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Testing & Coverage Artifacts
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# IDE & OS Metadata
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Documentation & Temporary Files
+*.log
+scratch/
+README.md
+backups/
+*.dump
+*.sha256
+infra/
+scripts/

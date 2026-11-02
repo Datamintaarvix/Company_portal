@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard &mdash; Company Employee Portal</title>
+  <link rel="stylesheet" href="/static/css/portal.css">
+</head>
+<body id="dashboardRoot">
+  <div class="app-layout">
+    <!-- Sidebar -->
+    <aside class="app-sidebar" id="appSidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-brand-badge" aria-hidden="true">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+          </svg>
+        </div>
+        <span class="sidebar-title">Company Portal</span>
+      </div>
+
+      <!-- Navigation Links Container (Populated based on role) -->
+      <nav class="sidebar-nav" id="sidebarNavContainer" aria-label="Portal Navigation">
+        <!-- Rendered dynamically by portal.js -->
+        <div style="padding: 12px; color: var(--text-muted); font-size: 13px;">Loading navigation...</div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <button id="logoutBtn" class="logout-btn" title="Sign out of your session">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+          </svg>
+          <span>Log Out</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="app-main">
+      <header class="app-header">
+        <div class="header-left">
+          <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+          </button>
+          <h2 class="header-title" id="headerTitle">My Profile</h2>
+        </div>
+
+        <div class="user-badge-group">
+          <div class="user-avatar" id="headerUserAvatar">U</div>
+          <div class="user-info">
+            <span class="user-name" id="headerUserName">Loading...</span>
+            <span class="role-pill" id="headerUserRole">employee</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="app-content">
+        <!-- SECTION 1: MY PROFILE -->
+        <section id="profileSection" class="content-section active">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Employee Profile Details</h3>
+            </div>
+            <div class="card-body">
+              <div class="profile-grid">
+                <div class="profile-field">
+                  <span class="profile-field-label">Full Name</span>
+                  <span class="profile-field-value" id="profName">—</span>
+                </div>
+                <div class="profile-field">
+                  <span class="profile-field-label">Employee Code</span>
+                  <span class="profile-field-value" id="profCode">—</span>
+                </div>
+                <div class="profile-field">
+                  <span class="profile-field-label">Email Address</span>
+                  <span class="profile-field-value" id="profEmail">—</span>
+                </div>
+                <div class="profile-field">
+                  <span class="profile-field-label">Department</span>
+                  <span class="profile-field-value" id="profDept">—</span>
+                </div>
+                <div class="profile-field">
+                  <span class="profile-field-label">Assigned Role</span>
+                  <span class="profile-field-value"><span id="profRole" class="role-pill">employee</span></span>
+                </div>
+                <div class="profile-field">
+                  <span class="profile-field-label">Account Status</span>
+                  <span class="profile-field-value"><span id="profStatus" class="status-pill status-active">Active</span></span>
+                </div>
+                <div class="profile-field">
+                  <span class="profile-field-label">Registered Since</span>
+                  <span class="profile-field-value" id="profCreated">—</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Self-Service Name Update Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Self-Service Profile Update</h3>
+            </div>
+            <div class="card-body">
+              <p style="font-size: 13.5px; margin-bottom: 16px;">
+                You may update your preferred display name below. Role, department, and employee code changes require HR or Administrator authorization.
+              </p>
+              <div id="selfEditAlert"></div>
+              <form id="selfEditForm" style="max-width: 440px;">
+                <div class="form-group">
+                  <label for="selfNameInput" class="form-label">Full Name</label>
+                  <input type="text" id="selfNameInput" class="form-input" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: auto; padding: 10px 24px;">Save Changes</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 2: MY ACCOUNT -->
+        <section id="accountSection" class="content-section">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Security &amp; Session Information</h3>
+            </div>
+            <div class="card-body">
+              <div style="font-size: 14px; line-height: 1.6; color: var(--text-main);">
+                <p style="margin-bottom: 12px;"><strong>Session Type:</strong> PostgreSQL Server-Side Session with HTTP-Only Cookie</p>
+                <p style="margin-bottom: 12px;"><strong>Session Expiry Policy:</strong> 120 Minutes of Inactivity</p>
+                <p style="margin-bottom: 12px;"><strong>Protection Measures:</strong> Double-Submit / Session-Bound CSRF Token Header Validation, Argon2id Password Encryption</p>
+                <p style="margin-bottom: 0;"><strong>Active State:</strong> Verified Against Database on Every Request</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 3: EMPLOYEE DIRECTORY (HR & Admin) -->
+        <section id="directorySection" class="content-section">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Employee Directory</h3>
+            </div>
+            <div class="card-body" style="padding-bottom: 0;">
+              <!-- Table Toolbar -->
+              <div class="table-toolbar">
+                <div class="table-filters">
+                  <input
+                    type="text"
+                    id="dirSearchInput"
+                    class="form-input search-input"
+                    placeholder="Search by name, email, or code..."
+                  >
+                  <select id="dirDeptSelect" class="form-select" style="width: auto;">
+                    <option value="">All Departments</option>
+                    <option value="Engineering">Engineering</option>
+                    <option value="Human Resources">Human Resources</option>
+                    <option value="IT Administration">IT Administration</option>
+                    <option value="Finance">Finance</option>
+                    <option value="Operations">Operations</option>
+                  </select>
+                  <select id="dirRoleSelect" class="form-select" style="width: auto;">
+                    <option value="">All Roles</option>
+                    <option value="employee">Employee</option>
+                    <option value="hr">HR</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Directory Table -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Code</th>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Department</th>
+                      <th>Role</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="directoryTableBody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Controls -->
+              <div class="pagination-bar">
+                <span id="paginationInfo">Showing 0 of 0</span>
+                <div style="display: flex; gap: 8px;">
+                  <button id="prevPageBtn" class="btn-secondary" disabled>&larr; Previous</button>
+                  <button id="nextPageBtn" class="btn-secondary" disabled>Next &rarr;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 4: PROVISION EMPLOYEE (HR & Admin) -->
+        <section id="provisionSection" class="content-section">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Provision New Employee Account</h3>
+            </div>
+            <div class="card-body">
+              <p style="font-size: 13.5px; margin-bottom: 20px;">
+                Securely provision staff accounts with Argon2id password encryption. HR personnel may create Employee and HR accounts; Administrator authorization is required to create Admin accounts.
+              </p>
+              <div id="provisionAlert"></div>
+              <form id="provisionForm" style="max-width: 500px;" novalidate>
+                <div class="form-group">
+                  <label for="provCodeInput" class="form-label">Employee Code *</label>
+                  <input type="text" id="provCodeInput" class="form-input" placeholder="EMP-100" required>
+                </div>
+                <div class="form-group">
+                  <label for="provNameInput" class="form-label">Full Name *</label>
+                  <input type="text" id="provNameInput" class="form-input" placeholder="Jane Doe" required>
+                </div>
+                <div class="form-group">
+                  <label for="provEmailInput" class="form-label">Corporate Email Address *</label>
+                  <input type="email" id="provEmailInput" class="form-input" placeholder="jane.doe@company.com" required>
+                </div>
+                <div class="form-group">
+                  <label for="provDeptInput" class="form-label">Department</label>
+                  <input type="text" id="provDeptInput" class="form-input" placeholder="Engineering">
+                </div>
+                <div class="form-group">
+                  <label for="provRoleSelect" class="form-label">Role *</label>
+                  <select id="provRoleSelect" class="form-select" required>
+                    <!-- Options populated based on role in portal.js -->
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="provPasswordInput" class="form-label">Initial Password * (min 8 chars, mixed case + digit)</label>
+                  <input type="password" id="provPasswordInput" class="form-input" placeholder="••••••••••••" required>
+                </div>
+                <button type="submit" class="btn-primary" style="width: auto; padding: 11px 28px;">
+                  Provision Account
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 5: ADMIN OPERATIONS -->
+        <section id="adminOverviewSection" class="content-section">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Administrative Role &amp; Status Controls</h3>
+            </div>
+            <div class="card-body">
+              <p style="font-size: 13.5px; margin-bottom: 16px;">
+                Administrators can promote or demote user roles and activate or deactivate employee accounts. Deactivating an account immediately purges all active session rows in PostgreSQL to prevent unauthorized access.
+              </p>
+              <div class="alert alert-warning" style="margin-bottom: 24px;">
+                <strong>Protection Rule:</strong> Self-demotion and self-deactivation are strictly blocked by backend RBAC safeguards to prevent administrator lockout.
+              </div>
+              <button class="btn-primary" style="width: auto;" onclick="document.querySelector('[data-target=\'directorySection\']').click();">
+                Browse Directory to Manage Staff Roles &amp; Status
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 6: EMPLOYEE ATTENDANCE (All Roles) -->
+        <section id="attendanceSection" class="content-section">
+          <!-- Live IST Clock & Shift Status Hero Card -->
+          <div class="live-clock-card">
+            <div class="live-clock-details">
+              <span class="live-clock-label">Company Timezone (IST)</span>
+              <span id="istLiveClock" class="live-clock-time">--:--:-- -- IST</span>
+              <span id="todayWorkDateText" class="live-clock-date">Loading current date...</span>
+            </div>
+            <div style="text-align: right;">
+              <span style="font-size: 12px; color: #bfdbfe; font-weight: 600; display: block; margin-bottom: 4px;">PUNCH STATUS</span>
+              <span id="todayStatusBadge" class="status-pill" style="font-size: 13px; padding: 4px 12px;">Checking...</span>
+            </div>
+          </div>
+
+          <!-- Shift Details & Punch Action Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Today's Attendance Punch</h3>
+            </div>
+            <div class="card-body">
+              <div class="punch-metrics-grid">
+                <div class="punch-metric-item">
+                  <span class="punch-metric-label">Check-in Time (IST)</span>
+                  <span id="todayCheckInTime" class="punch-metric-value">—</span>
+                </div>
+                <div class="punch-metric-item">
+                  <span class="punch-metric-label">Check-out Time (IST)</span>
+                  <span id="todayCheckOutTime" class="punch-metric-value">—</span>
+                </div>
+                <div class="punch-metric-item">
+                  <span class="punch-metric-label">Workday Schedule</span>
+                  <span id="todayDayType" class="punch-metric-value">—</span>
+                </div>
+                <div class="punch-metric-item">
+                  <span class="punch-metric-label">Active Shift Duration</span>
+                  <span id="todayDuration" class="punch-metric-value">—</span>
+                </div>
+              </div>
+
+              <!-- Punch Actions -->
+              <div id="punchAlert"></div>
+              <div class="punch-actions-bar">
+                <input
+                  type="text"
+                  id="punchNotesInput"
+                  class="form-input"
+                  placeholder="Optional punch remark (e.g. WFH, client visit)..."
+                  style="max-width: 360px;"
+                >
+                <div style="display: flex; gap: 10px;">
+                  <button id="btnCheckIn" class="btn-punch-in" disabled>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span>Check In</span>
+                  </button>
+                  <button id="btnCheckOut" class="btn-punch-out" disabled>
+                    <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    <span>Check Out</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Personal Attendance History Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">My Attendance History</h3>
+            </div>
+            <div class="card-body" style="padding-bottom: 0;">
+              <!-- History Toolbar / Filters -->
+              <div class="table-toolbar">
+                <div class="table-filters" style="align-items: center;">
+                  <label for="myAttStartDate" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">From:</label>
+                  <input type="date" id="myAttStartDate" class="form-input" style="width: auto;">
+                  <label for="myAttEndDate" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">To:</label>
+                  <input type="date" id="myAttEndDate" class="form-input" style="width: auto;">
+                  <button id="btnFilterMyAtt" class="btn-secondary">Filter</button>
+                  <button id="btnResetMyAtt" class="btn-secondary">Reset</button>
+                </div>
+              </div>
+
+              <!-- History Table -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Work Date</th>
+                      <th>Check In (IST)</th>
+                      <th>Check Out (IST)</th>
+                      <th>Duration</th>
+                      <th>Status</th>
+                      <th>Day Type</th>
+                      <th>Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody id="myAttendanceTableBody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Bar -->
+              <div class="pagination-bar">
+                <span id="myAttPaginationInfo">Showing 0 of 0</span>
+                <div style="display: flex; gap: 8px;">
+                  <button id="myAttPrevBtn" class="btn-secondary" disabled>&larr; Previous</button>
+                  <button id="myAttNextBtn" class="btn-secondary" disabled>Next &rarr;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 7: COMPANY ATTENDANCE MANAGEMENT (HR & Admin) -->
+        <section id="attendanceAdminSection" class="content-section">
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Company Attendance Directory &amp; Audit</h3>
+            </div>
+            <div class="card-body" style="padding-bottom: 0;">
+              <!-- Toolbar / Filters -->
+              <div class="table-toolbar">
+                <div class="table-filters" style="flex-wrap: wrap;">
+                  <input
+                    type="number"
+                    id="admAttEmpId"
+                    class="form-input"
+                    placeholder="Emp ID..."
+                    style="width: 100px;"
+                  >
+                  <input
+                    type="text"
+                    id="admAttDept"
+                    class="form-input"
+                    placeholder="Department..."
+                    style="width: 140px;"
+                  >
+                  <input type="date" id="admAttStartDate" class="form-input" style="width: auto;" title="Start date">
+                  <input type="date" id="admAttEndDate" class="form-input" style="width: auto;" title="End date">
+                  <select id="admAttStatus" class="form-select" style="width: auto;">
+                    <option value="">All Statuses</option>
+                    <option value="present">Present</option>
+                    <option value="incomplete">Incomplete</option>
+                    <option value="half_day">Half Day</option>
+                    <option value="absent">Absent</option>
+                  </select>
+                  <button id="btnFilterAdmAtt" class="btn-secondary">Apply Filters</button>
+                  <button id="btnResetAdmAtt" class="btn-secondary">Reset</button>
+                </div>
+              </div>
+
+              <!-- Company Table -->
+              <div class="table-responsive">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Employee</th>
+                      <th>Department</th>
+                      <th>Work Date</th>
+                      <th>Check In (IST)</th>
+                      <th>Check Out (IST)</th>
+                      <th>Duration</th>
+                      <th>Status</th>
+                      <th>Schedule</th>
+                      <th>Audit</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="companyAttendanceTableBody">
+                    <!-- Populated dynamically -->
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Bar -->
+              <div class="pagination-bar">
+                <span id="companyAttPaginationInfo">Showing 0 of 0</span>
+                <div style="display: flex; gap: 8px;">
+                  <button id="companyAttPrevBtn" class="btn-secondary" disabled>&larr; Previous</button>
+                  <button id="companyAttNextBtn" class="btn-secondary" disabled>Next &rarr;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 8: LEAVE MANAGEMENT (Employee Self-Service) -->
+        <section id="leavesSection" class="content-section" aria-labelledby="leaveSectionHeading">
+          <!-- Page Header & Apply Action -->
+          <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+              <h2 id="leaveSectionHeading" class="section-title" style="font-size: 20px; font-weight: 700; color: var(--text-main);">Leave Management</h2>
+              <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Track your leave balances, view submission history, and apply for time off.</p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <button id="btnClaimCompoff" class="btn-secondary" type="button" aria-label="Claim compensatory off" style="width: auto; padding: 10px 18px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span>Claim Comp-Off</span>
+              </button>
+              <button id="btnApplyLeave" class="btn-primary" type="button" aria-label="Apply for time off" style="width: auto; padding: 10px 20px;">
+                <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>Apply for Leave</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Section Notifications -->
+          <div id="leaveSectionAlert" role="alert" aria-live="polite"></div>
+
+          <!-- Leave Balance Cards (4 Buckets) -->
+          <div class="leave-balance-grid" role="region" aria-label="Leave Balances">
+            <!-- 1. Casual Leave (CL) -->
+            <div class="balance-card" id="cardCL" tabindex="0" aria-label="Casual Leave Balance">
+              <div class="balance-card-header">
+                <span class="balance-card-title">Casual Leave</span>
+                <span class="balance-card-code">CL</span>
+              </div>
+              <div class="balance-card-value">
+                <span id="balValCL">—</span>
+                <span class="balance-card-unit">days</span>
+              </div>
+              <div class="balance-card-meta">
+                <span>Used: <strong id="usedValCL">—</strong></span>
+                <span>Reserved: <strong id="resValCL">—</strong></span>
+              </div>
+            </div>
+
+            <!-- 2. Sick Leave (SL) -->
+            <div class="balance-card" id="cardSL" tabindex="0" aria-label="Sick Leave Balance">
+              <div class="balance-card-header">
+                <span class="balance-card-title">Sick Leave</span>
+                <span class="balance-card-code">SL</span>
+              </div>
+              <div class="balance-card-value">
+                <span id="balValSL">—</span>
+                <span class="balance-card-unit">days</span>
+              </div>
+              <div class="balance-card-meta">
+                <span>Used: <strong id="usedValSL">—</strong></span>
+                <span>Reserved: <strong id="resValSL">—</strong></span>
+              </div>
+            </div>
+
+            <!-- 3. Earned Leave (EL) -->
+            <div class="balance-card" id="cardEL" tabindex="0" aria-label="Earned Leave Balance">
+              <div class="balance-card-header">
+                <span class="balance-card-title">Earned Leave</span>
+                <span class="balance-card-code">EL</span>
+              </div>
+              <div class="balance-card-value">
+                <span id="balValEL">—</span>
+                <span class="balance-card-unit">days</span>
+              </div>
+              <div class="balance-card-meta">
+                <span>Used: <strong id="usedValEL">—</strong></span>
+                <span>Reserved: <strong id="resValEL">—</strong></span>
+              </div>
+            </div>
+
+            <!-- 4. Comp-Off -->
+            <div class="balance-card" id="cardCO" tabindex="0" aria-label="Compensatory Off Balance">
+              <div class="balance-card-header">
+                <span class="balance-card-title">Comp-Off</span>
+                <span class="balance-card-code">CO</span>
+              </div>
+              <div class="balance-card-value">
+                <span id="balValCO">—</span>
+                <span class="balance-card-unit">days</span>
+              </div>
+              <div class="balance-card-meta">
+                <span>Used: <strong id="usedValCO">—</strong></span>
+                <span>Reserved: <strong id="resValCO">—</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- My Leave Requests Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">My Leave Requests</h3>
+            </div>
+            <div class="card-body" style="padding-bottom: 0;">
+              <div class="table-responsive">
+                <table class="data-table" aria-label="My Leave Requests History">
+                  <thead>
+                    <tr>
+                      <th scope="col">Category</th>
+                      <th scope="col">Dates</th>
+                      <th scope="col">Days</th>
+                      <th scope="col">Applied On</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="myLeavesTableBody">
+                    <tr>
+                      <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                        No leave requests found. Click &quot;Apply for Leave&quot; to submit a new application.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Bar -->
+              <div class="pagination-bar" id="myLeavesPagination">
+                <span id="myLeavesPaginationInfo">Showing 0 of 0</span>
+                <div style="display: flex; gap: 8px;">
+                  <button id="myLeavesPrevBtn" class="btn-secondary" type="button" disabled>&larr; Previous</button>
+                  <button id="myLeavesNextBtn" class="btn-secondary" type="button" disabled>Next &rarr;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- My Compensatory Off Claims Card -->
+          <div class="card" style="margin-top: 24px;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+              <h3 class="card-title">My Comp-Off Claims</h3>
+              <button id="btnRefreshMyCompoff" class="btn-secondary" type="button" style="padding: 4px 10px; font-size: 12px;">Refresh Claims</button>
+            </div>
+            <div class="card-body" style="padding-bottom: 0;">
+              <div class="table-responsive">
+                <table class="data-table" aria-label="My Comp-Off Claims History">
+                  <thead>
+                    <tr>
+                      <th scope="col">Extra-Work Date</th>
+                      <th scope="col">Days Claimed</th>
+                      <th scope="col">Days Credited</th>
+                      <th scope="col">Reason</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Review Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody id="myCompoffTableBody">
+                    <tr>
+                      <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                        No compensatory off claims submitted. Click &quot;Claim Comp-Off&quot; to submit a claim for weekend or holiday work.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination / status info -->
+              <div class="pagination-bar" id="myCompoffPagination">
+                <span id="myCompoffPaginationInfo">Showing 0 claims</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SECTION 9: PENDING LEAVE APPROVALS (HR & Admin Management) -->
+        <section id="leavesAdminSection" class="content-section" aria-labelledby="leaveAdminHeading">
+          <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
+            <div>
+              <h2 id="leaveAdminHeading" class="section-title" style="font-size: 20px; font-weight: 700; color: var(--text-main);">Pending Leave Approvals</h2>
+              <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Review and action submitted leave applications from company staff.</p>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+              <button id="btnOpenAdjustBalanceModal" class="btn-secondary" type="button" aria-label="Adjust employee leave balance">
+                Adjust Leave Balance
+              </button>
+              <button id="btnRefreshAdminLeaves" class="btn-secondary" type="button" aria-label="Refresh approval queues">
+                Refresh Queues
+              </button>
+            </div>
+          </div>
+
+          <!-- Admin Section Alerts -->
+          <div id="leaveAdminAlert" role="alert" aria-live="polite"></div>
+
+          <!-- Pending Requests Card -->
+          <div class="card">
+            <div class="card-header">
+              <h3 class="card-title">Awaiting Approval Queue</h3>
+            </div>
+            <div class="card-body" style="padding-bottom: 0;">
+              <div class="table-responsive">
+                <table class="data-table" aria-label="Pending Leave Approvals">
+                  <thead>
+                    <tr>
+                      <th scope="col">Employee</th>
+                      <th scope="col">Category</th>
+                      <th scope="col">Dates</th>
+                      <th scope="col">Days</th>
+                      <th scope="col">Applied On</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="pendingLeavesTableBody">
+                    <tr>
+                      <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                        No pending leave requests awaiting approval.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Bar -->
+              <div class="pagination-bar" id="pendingLeavesPagination">
+                <span id="pendingLeavesPaginationInfo">Showing 0 of 0</span>
+                <div style="display: flex; gap: 8px;">
+                  <button id="pendingLeavesPrevBtn" class="btn-secondary" type="button" disabled>&larr; Previous</button>
+                  <button id="pendingLeavesNextBtn" class="btn-secondary" type="button" disabled>Next &rarr;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comp-Off Claims Management Card -->
+          <div class="card" style="margin-top: 24px;">
+            <div class="card-header">
+              <h3 class="card-title">Compensatory Off Extra-Work Claims</h3>
+            </div>
+            <div class="card-body" style="padding-bottom: 0;">
+              <div class="table-responsive">
+                <table class="data-table" aria-label="Comp-Off Extra-Work Claims">
+                  <thead>
+                    <tr>
+                      <th scope="col">Employee</th>
+                      <th scope="col">Extra-Work Date</th>
+                      <th scope="col">Days Claimed</th>
+                      <th scope="col">Reason</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="adminCompoffTableBody">
+                    <tr>
+                      <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                        No compensatory off claims awaiting review.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Pagination Bar -->
+              <div class="pagination-bar" id="adminCompoffPagination">
+                <span id="adminCompoffPaginationInfo">Showing 0 of 0</span>
+                <div style="display: flex; gap: 8px;">
+                  <button id="adminCompoffPrevBtn" class="btn-secondary" type="button" disabled>&larr; Previous</button>
+                  <button id="adminCompoffNextBtn" class="btn-secondary" type="button" disabled>Next &rarr;</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- 1. View Employee Detail Modal -->
+  <div class="modal-backdrop" id="detailModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title">Employee Record</h4>
+        <button class="modal-close-btn" onclick="closeModal('detailModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="profile-grid">
+          <div class="profile-field">
+            <span class="profile-field-label">Code</span>
+            <span class="profile-field-value" id="detailEmpCode">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Name</span>
+            <span class="profile-field-value" id="detailEmpName">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Email</span>
+            <span class="profile-field-value" id="detailEmpEmail">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Department</span>
+            <span class="profile-field-value" id="detailEmpDept">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Role</span>
+            <span class="profile-field-value" id="detailEmpRole">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Status</span>
+            <span class="profile-field-value" id="detailEmpStatus">—</span>
+          </div>
+          <div class="profile-field" style="grid-column: 1 / -1;">
+            <span class="profile-field-label">Created At</span>
+            <span class="profile-field-value" id="detailEmpCreated">—</span>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeModal('detailModal')">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Edit Employee Modal (HR & Admin) -->
+  <div class="modal-backdrop" id="editEmployeeModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title">Edit Employee Information</h4>
+        <button class="modal-close-btn" onclick="closeModal('editEmployeeModal')">&times;</button>
+      </div>
+      <form id="editEmployeeForm">
+        <div class="modal-body">
+          <div id="editEmpAlert"></div>
+          <input type="hidden" id="editEmpId">
+          <div class="form-group">
+            <label for="editEmpName" class="form-label">Full Name</label>
+            <input type="text" id="editEmpName" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label for="editEmpDept" class="form-label">Department</label>
+            <input type="text" id="editEmpDept" class="form-input">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('editEmployeeModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Save Updates</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 3. Admin Change Role Modal -->
+  <div class="modal-backdrop" id="roleModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title">Change Organizational Role</h4>
+        <button class="modal-close-btn" onclick="closeModal('roleModal')">&times;</button>
+      </div>
+      <form id="roleForm">
+        <div class="modal-body">
+          <div id="roleAlert"></div>
+          <input type="hidden" id="roleEmpId">
+          <div class="form-group">
+            <label for="roleSelect" class="form-label">Assign Role</label>
+            <select id="roleSelect" class="form-select" required>
+              <option value="employee">Employee</option>
+              <option value="hr">HR</option>
+              <option value="admin">Administrator</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('roleModal')">Cancel</button>
+          <button type="submit" class="btn-primary" style="width: auto;">Update Role</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 4. Admin Activate/Deactivate Status Modal -->
+  <div class="modal-backdrop" id="statusModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title">Confirm Account Status Change</h4>
+        <button class="modal-close-btn" onclick="closeModal('statusModal')">&times;</button>
+      </div>
+      <form id="statusForm">
+        <div class="modal-body">
+          <div id="statusAlert"></div>
+          <input type="hidden" id="statusEmpId">
+          <input type="hidden" id="statusTargetState">
+          <p id="statusPromptText" style="font-size: 14px; color: var(--text-main); line-height: 1.5;"></p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('statusModal')">Cancel</button>
+          <button type="submit" class="btn-danger">Confirm</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 5. HR/Admin Audited Attendance Correction Modal -->
+  <div class="modal-backdrop" id="correctAttendanceModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title">Audited Attendance Correction</h4>
+        <button class="modal-close-btn" onclick="closeModal('correctAttendanceModal')">&times;</button>
+      </div>
+      <form id="correctAttendanceForm">
+        <div class="modal-body">
+          <div id="correctAttAlert"></div>
+          <input type="hidden" id="correctRecordId">
+
+          <div style="background: var(--bg-app); padding: 12px 16px; border-radius: var(--radius-sm); margin-bottom: 16px; border: 1px solid var(--border-color); font-size: 13.5px;">
+            <div><strong>Employee:</strong> <span id="correctModalEmpName">—</span> (<span id="correctModalEmpCode">—</span>)</div>
+            <div style="margin-top: 4px;"><strong>Work Date:</strong> <span id="correctModalWorkDate">—</span></div>
+          </div>
+
+          <div class="form-group">
+            <label for="correctCheckInInput" class="form-label">Check-in Timestamp (Local IST)</label>
+            <input type="datetime-local" id="correctCheckInInput" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label for="correctCheckOutInput" class="form-label">Check-out Timestamp (Local IST)</label>
+            <input type="datetime-local" id="correctCheckOutInput" class="form-input">
+          </div>
+
+          <div class="form-group">
+            <label for="correctStatusSelect" class="form-label">Operational Status *</label>
+            <select id="correctStatusSelect" class="form-select" required>
+              <option value="present">Present</option>
+              <option value="incomplete">Incomplete</option>
+              <option value="half_day">Half Day</option>
+              <option value="absent">Absent</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="correctReasonInput" class="form-label">Mandatory Audit Explanation * (min 3 chars)</label>
+            <textarea
+              id="correctReasonInput"
+              class="form-input"
+              rows="3"
+              placeholder="Provide a clear, auditable justification (e.g. Employee forgot punch; swipe record verified by HR)..."
+              required
+              minlength="3"
+            ></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="correctNotesInput" class="form-label">Optional Remarks / Notes</label>
+            <input type="text" id="correctNotesInput" class="form-input" placeholder="Optional notes for record...">
+          </div>
+
+          <div class="alert alert-warning" style="font-size: 12.5px; line-height: 1.4; margin-top: 14px;">
+            <strong>Audit Policy:</strong> All modifications are permanently recorded in PostgreSQL audit logs with your user ID, timestamp, justification, and before/after values.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" onclick="closeModal('correctAttendanceModal')">Cancel</button>
+          <button type="submit" id="btnSubmitCorrection" class="btn-primary" style="width: auto;">Apply &amp; Audit Correction</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 6. Apply Leave Modal (Employee Self-Service) -->
+  <div class="modal-backdrop" id="applyLeaveModal" role="dialog" aria-modal="true" aria-labelledby="applyLeaveModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title" id="applyLeaveModalTitle">Apply for Leave</h4>
+        <button type="button" class="modal-close-btn" id="closeApplyLeaveModalBtn" aria-label="Close modal">&times;</button>
+      </div>
+      <form id="applyLeaveForm" novalidate>
+        <div class="modal-body">
+          <div id="applyLeaveAlert" role="alert" aria-live="polite"></div>
+
+          <!-- Leave Category Dropdown -->
+          <div class="form-group">
+            <label for="leaveCategorySelect" class="form-label">Leave Category *</label>
+            <select id="leaveCategorySelect" class="form-select" required>
+              <option value="">Select a category...</option>
+              <option value="CASUAL">Casual Leave (CL)</option>
+              <option value="SICK">Sick Leave (SL)</option>
+              <option value="EARNED">Earned Leave (EL)</option>
+              <option value="COMP_OFF">Compensatory Off (Comp-Off)</option>
+              <option value="UNPAID">Unpaid Leave</option>
+              <option value="SABBATICAL">Sabbatical Leave</option>
+            </select>
+          </div>
+
+          <!-- Date Pickers Grid -->
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="leaveStartDate" class="form-label">Start Date *</label>
+              <input type="date" id="leaveStartDate" class="form-input" required>
+            </div>
+            <div class="form-group">
+              <label for="leaveEndDate" class="form-label">End Date *</label>
+              <input type="date" id="leaveEndDate" class="form-input" required>
+            </div>
+          </div>
+
+          <!-- Half-Day Toggle -->
+          <div class="form-group" style="margin-bottom: 14px;">
+            <label class="form-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-weight: 500;">
+              <input type="checkbox" id="leaveIsHalfDay" style="width: 16px; height: 16px; cursor: pointer;">
+              <span>Apply for Half-Day Leave</span>
+            </label>
+          </div>
+
+          <!-- Half-Day Period Selector (Morning / Afternoon) -->
+          <div class="form-group" id="halfDayPeriodGroup" style="display: none;">
+            <label for="leaveHalfDayPeriod" class="form-label">Half-Day Period *</label>
+            <select id="leaveHalfDayPeriod" class="form-select">
+              <option value="morning">Morning (First Half)</option>
+              <option value="afternoon">Afternoon (Second Half)</option>
+            </select>
+          </div>
+
+          <!-- Reason Field -->
+          <div class="form-group">
+            <label for="leaveReason" class="form-label">Reason * (minimum 3 characters)</label>
+            <textarea
+              id="leaveReason"
+              class="form-input"
+              rows="3"
+              placeholder="State the reason or purpose for your leave request..."
+              required
+              minlength="3"
+              maxlength="500"
+            ></textarea>
+          </div>
+
+          <!-- Live Calculation Preview Container -->
+          <div id="leavePreviewContainer" style="display: none; margin-top: 10px;"></div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btnCancelApplyLeave">Cancel</button>
+          <button type="submit" id="btnSubmitLeave" class="btn-primary" style="width: auto;">
+            <span id="btnSubmitLeaveText">Submit Application</span>
+            <span id="btnSubmitLeaveSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 7. Review Leave Request Modal (HR & Admin) -->
+  <div class="modal-backdrop" id="reviewLeaveModal" role="dialog" aria-modal="true" aria-labelledby="reviewLeaveModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title" id="reviewLeaveModalTitle">Review Leave Application</h4>
+        <button type="button" class="modal-close-btn" id="closeReviewLeaveModalBtn" aria-label="Close review leave modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="reviewLeaveAlert" role="alert" aria-live="polite"></div>
+        <input type="hidden" id="revLeaveId">
+        <input type="hidden" id="revLeaveEmpId">
+
+        <!-- Anti-Self Approval Warning -->
+        <div id="selfApprovalWarning" class="alert alert-warning" style="display: none; font-size: 13px;">
+          <strong>Anti-Self-Approval Safeguard:</strong> This is your personal leave application. You cannot approve or reject your own leave.
+        </div>
+
+        <div style="background: var(--bg-app); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 16px; font-size: 13.5px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span><strong>Employee:</strong> <span id="revEmpName">—</span> (<span id="revEmpCode">—</span>)</span>
+            <span><strong>Category:</strong> <span id="revCategory">—</span></span>
+          </div>
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span><strong>Dates:</strong> <span id="revDates">—</span></span>
+            <span><strong>Charged:</strong> <strong id="revTotalDays">—</strong></span>
+          </div>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 2px;">REASON GIVEN:</div>
+            <div id="revReason" style="color: var(--text-main); font-style: italic;">—</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="reviewNotesInput" class="form-label">Review Remarks / Rejection Reason</label>
+          <textarea
+            id="reviewNotesInput"
+            class="form-input"
+            rows="3"
+            placeholder="Optional on approval; mandatory on rejection (min 3 characters)..."
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="btnCancelReviewLeave">Cancel</button>
+        <button type="button" class="btn-danger" id="btnRejectLeave">
+          <span id="btnRejectLeaveText">Reject Request</span>
+          <span id="btnRejectLeaveSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn-primary" id="btnApproveLeave" style="width: auto;">
+          <span id="btnApproveLeaveText">Approve Request</span>
+          <span id="btnApproveLeaveSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Review Comp-Off Claim Modal (HR & Admin) -->
+  <div class="modal-backdrop" id="reviewCompoffModal" role="dialog" aria-modal="true" aria-labelledby="reviewCompoffModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title" id="reviewCompoffModalTitle">Review Comp-Off Claim</h4>
+        <button type="button" class="modal-close-btn" id="closeReviewCompoffModalBtn" aria-label="Close review compoff modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div id="reviewCompoffAlert" role="alert" aria-live="polite"></div>
+        <input type="hidden" id="revClaimId">
+        <input type="hidden" id="revClaimEmpId">
+
+        <!-- Anti-Self Review Warning -->
+        <div id="coSelfApprovalWarning" class="alert alert-warning" style="display: none; font-size: 13px;">
+          <strong>Anti-Self-Review Safeguard:</strong> This is your personal Comp-Off claim. You cannot review your own claim.
+        </div>
+
+        <div style="background: var(--bg-app); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 16px; font-size: 13.5px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span><strong>Employee:</strong> <span id="coRevEmpName">—</span> (<span id="coRevEmpCode">—</span>)</span>
+            <span><strong>Work Date:</strong> <span id="coRevWorkDate">—</span></span>
+          </div>
+          <div style="margin-bottom: 6px;">
+            <span><strong>Days Claimed:</strong> <strong id="coRevDaysClaimed">—</strong></span>
+          </div>
+          <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
+            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 2px;">WORK DETAILS:</div>
+            <div id="coRevReason" style="color: var(--text-main); font-style: italic;">—</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="coDaysApprovedSelect" class="form-label">Days to Grant *</label>
+          <select id="coDaysApprovedSelect" class="form-select">
+            <option value="1.0">1.0 Full Day Credit</option>
+            <option value="0.5">0.5 Half Day Credit</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="coReviewNotesInput" class="form-label">Review Remarks / Rejection Reason</label>
+          <textarea
+            id="coReviewNotesInput"
+            class="form-input"
+            rows="3"
+            placeholder="Optional on approval; mandatory on rejection (min 3 characters)..."
+          ></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-secondary" id="btnCancelReviewCompoff">Cancel</button>
+        <button type="button" class="btn-danger" id="btnRejectCompoff">
+          <span id="btnRejectCompoffText">Reject Claim</span>
+          <span id="btnRejectCompoffSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+        <button type="button" class="btn-primary" id="btnApproveCompoff" style="width: auto;">
+          <span id="btnApproveCompoffText">Approve &amp; Grant Credit</span>
+          <span id="btnApproveCompoffSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. Administrative Leave Balance Adjustment Modal (HR & Admin) -->
+  <div class="modal-backdrop" id="adjustBalanceModal" role="dialog" aria-modal="true" aria-labelledby="adjustBalanceModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title" id="adjustBalanceModalTitle">Adjust Employee Leave Balance</h4>
+        <button type="button" class="modal-close-btn" id="closeAdjustBalanceModalBtn" aria-label="Close balance adjustment modal">&times;</button>
+      </div>
+      <form id="adjustBalanceForm" novalidate>
+        <div class="modal-body">
+          <div id="adjustBalanceAlert" role="alert" aria-live="polite"></div>
+
+          <div class="form-group">
+            <label for="adjEmployeeSelect" class="form-label">Target Employee *</label>
+            <select id="adjEmployeeSelect" class="form-select" required>
+              <option value="">Select an employee...</option>
+            </select>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="adjCategorySelect" class="form-label">Leave Category *</label>
+              <select id="adjCategorySelect" class="form-select" required>
+                <option value="CASUAL">Casual Leave (CL)</option>
+                <option value="SICK">Sick Leave (SL)</option>
+                <option value="EARNED">Earned Leave (EL)</option>
+                <option value="COMP_OFF">Compensatory Off (CO)</option>
+                <option value="UNPAID">Unpaid Leave</option>
+                <option value="SABBATICAL">Sabbatical Leave</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="adjBucketSelect" class="form-label">Target Bucket *</label>
+              <select id="adjBucketSelect" class="form-select" required>
+                <option value="entitled">Entitled Days</option>
+                <option value="carried_forward">Carried Forward Days</option>
+                <option value="accrued">Accrued Days</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+            <div class="form-group">
+              <label for="adjYearInput" class="form-label">Calendar Year *</label>
+              <input type="number" id="adjYearInput" class="form-input" min="2020" max="2100" required>
+            </div>
+            <div class="form-group">
+              <label for="adjAmountInput" class="form-label">Delta Amount (+/- days) *</label>
+              <input type="number" id="adjAmountInput" class="form-input" step="0.5" placeholder="e.g. 1.0 or -1.0" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="adjReasonInput" class="form-label">Mandatory Audit Justification * (min 5 chars)</label>
+            <textarea
+              id="adjReasonInput"
+              class="form-input"
+              rows="3"
+              placeholder="State the clear administrative justification for this balance adjustment..."
+              required
+              minlength="5"
+              maxlength="255"
+            ></textarea>
+          </div>
+
+          <div class="alert alert-warning" style="font-size: 12.5px; line-height: 1.4; margin-top: 14px; margin-bottom: 0;">
+            <strong>Immutable Audit Policy:</strong> All balance adjustments create an irreversible entry in the PostgreSQL transaction ledger and audit log with your actor ID and before/after balances.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btnCancelAdjustBalance">Cancel</button>
+          <button type="submit" id="btnSubmitAdjustBalance" class="btn-primary" style="width: auto;">
+            <span id="btnSubmitAdjustText">Apply Adjustment</span>
+            <span id="btnSubmitAdjustSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- 10. Employee Claim Comp-Off Modal -->
+  <div class="modal-backdrop" id="claimCompoffModal" role="dialog" aria-modal="true" aria-labelledby="claimCompoffModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h4 class="modal-title" id="claimCompoffModalTitle">Claim Compensatory Off</h4>
+        <button type="button" class="modal-close-btn" id="closeClaimCompoffModalBtn" aria-label="Close claim comp-off modal">&times;</button>
+      </div>
+      <form id="claimCompoffForm" novalidate>
+        <div class="modal-body">
+          <div id="claimCompoffAlert" role="alert" aria-live="polite"></div>
+
+          <div class="form-group">
+            <label for="claimWorkDate" class="form-label">Extra-Work Date * (Past Weekend or Public Holiday)</label>
+            <input type="date" id="claimWorkDate" class="form-input" required>
+            <small style="font-size: 12px; color: var(--text-muted); display: block; margin-top: 4px;">
+              Claims are only valid for non-working days (weekends or public holidays). Future dates are prohibited.
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="claimDaysSelect" class="form-label">Days Claimed *</label>
+            <select id="claimDaysSelect" class="form-select" required>
+              <option value="1.0">1.0 Full Day (8+ hours extra work)</option>
+              <option value="0.5">0.5 Half Day (4–8 hours extra work)</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="claimReasonInput" class="form-label">Work Description / Justification * (minimum 3 characters)</label>
+            <textarea
+              id="claimReasonInput"
+              class="form-input"
+              rows="3"
+              placeholder="Describe the tasks, project, or emergency work performed on the non-working day..."
+              required
+              minlength="3"
+              maxlength="500"
+            ></textarea>
+          </div>
+
+          <div class="alert alert-info" style="font-size: 12.5px; line-height: 1.4; margin-top: 14px; margin-bottom: 0;">
+            <strong>Policy Notice:</strong> Comp-Off claims are reviewed by HR. Once approved, credits are added to your Comp-Off balance and remain valid for 90 days.
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" id="btnCancelClaimCompoff">Cancel</button>
+          <button type="submit" id="btnSubmitClaimCompoff" class="btn-primary" style="width: auto;">
+            <span id="btnSubmitClaimText">Submit Claim</span>
+            <span id="btnSubmitClaimSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="/static/js/portal.js"></script>
+</body>
+</html>

@@ -1,0 +1,95 @@
+services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: company_portal_prod_caddy
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    networks:
+      company-portal-prod-edge:
+      company-portal-prod-backend:
+        ipv4_address: 172.20.20.10
+    depends_on:
+      app:
+        condition: service_healthy
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: company-portal-app:latest
+    container_name: company_portal_prod_app
+    restart: unless-stopped
+    user: "10001:10001"
+    command: [
+      "uvicorn", "app.main:app",
+      "--host", "0.0.0.0",
+      "--port", "8000",
+      "--proxy-headers",
+      "--forwarded-allow-ips", "172.20.20.10"
+    ]
+    env_file:
+      - ${ENV_FILE:-.env.production}
+    environment:
+      - PORT=8000
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - COOKIE_SECURE=true
+      - POSTGRES_SERVER=db
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=company_portal_prod
+    expose:
+      - "8000"
+    networks:
+      - company-portal-prod-backend
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health/db').read()\" || exit 1"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+  db:
+    image: postgres:16-alpine
+    container_name: company_portal_prod_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-company_portal_prod_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-company_portal_prod}
+    volumes:
+      - company_portal_prod_postgres_data:/var/lib/postgresql/data
+    networks:
+      - company-portal-prod-backend
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-company_portal_prod_user} -d ${POSTGRES_DB:-company_portal_prod}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  company_portal_prod_postgres_data:
+  caddy_data:
+  caddy_config:
+
+networks:
+  company-portal-prod-edge:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.10.0/24
+  company-portal-prod-backend:
+    driver: bridge
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.20.20.0/24

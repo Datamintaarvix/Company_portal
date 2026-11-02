@@ -1,0 +1,210 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "AWS CloudFormation Template for Company Portal Automated Encrypted PostgreSQL Backups (S3 + SSE-KMS + IAM).",
+  "Parameters": {
+    "BucketName": {
+      "Type": "String",
+      "Default": "company-portal-backups-691634278287",
+      "Description": "Globally unique name for the private PostgreSQL backup S3 bucket."
+    },
+    "RetentionDays": {
+      "Type": "Number",
+      "Default": 30,
+      "Description": "Days to retain backup archives before automated expiration."
+    }
+  },
+  "Resources": {
+    "PostgresBackupKmsKey": {
+      "Type": "AWS::KMS::Key",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "Description": "Dedicated Customer Managed Key for encrypting Company Portal PostgreSQL database backups",
+        "EnableKeyRotation": true,
+        "KeyPolicy": {
+          "Version": "2012-10-17",
+          "Id": "company-portal-kms-policy",
+          "Statement": [
+            {
+              "Sid": "EnableRootAccountAdministration",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:root"
+                }
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "AllowBackupServiceKeyUsage",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::GetAtt": ["CompanyPortalBackupRole", "Arn"]
+                }
+              },
+              "Action": [
+                "kms:Encrypt",
+                "kms:Decrypt",
+                "kms:ReEncrypt*",
+                "kms:GenerateDataKey*",
+                "kms:DescribeKey"
+              ],
+              "Resource": "*"
+            }
+          ]
+        },
+        "Tags": [
+          { "Key": "Project", "Value": "CompanyPortal" },
+          { "Key": "Environment", "Value": "Production" }
+        ]
+      }
+    },
+    "PostgresBackupKmsAlias": {
+      "Type": "AWS::KMS::Alias",
+      "Properties": {
+        "AliasName": "alias/company-portal-db-backup-key",
+        "TargetKeyId": { "Ref": "PostgresBackupKmsKey" }
+      }
+    },
+    "PostgresBackupBucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain",
+      "UpdateReplacePolicy": "Retain",
+      "Properties": {
+        "BucketName": { "Ref": "BucketName" },
+        "OwnershipControls": {
+          "Rules": [
+            {
+              "ObjectOwnership": "BucketOwnerEnforced"
+            }
+          ]
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": true,
+          "IgnorePublicAcls": true,
+          "BlockPublicPolicy": true,
+          "RestrictPublicBuckets": true
+        },
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "aws:kms",
+                "KMSMasterKeyId": { "Fn::GetAtt": ["PostgresBackupKmsKey", "Arn"] }
+              },
+              "BucketKeyEnabled": true
+            }
+          ]
+        },
+        "LifecycleConfiguration": {
+          "Rules": [
+            {
+              "Id": "ExpireBackupsAfter30Days",
+              "Status": "Enabled",
+              "ExpirationInDays": { "Ref": "RetentionDays" },
+              "NoncurrentVersionExpiration": {
+                "NoncurrentDays": { "Ref": "RetentionDays" }
+              },
+              "AbortIncompleteMultipartUpload": {
+                "DaysAfterInitiation": 2
+              }
+            }
+          ]
+        },
+        "Tags": [
+          { "Key": "Project", "Value": "CompanyPortal" },
+          { "Key": "Environment", "Value": "Production" }
+        ]
+      }
+    },
+    "PostgresBackupBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": { "Ref": "PostgresBackupBucket" },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "EnforceTlsOnlyConnections",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": [
+                { "Fn::Sub": "arn:aws:s3:::${BucketName}" },
+                { "Fn::Sub": "arn:aws:s3:::${BucketName}/*" }
+              ],
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": "false"
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "CompanyPortalBackupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": "CompanyPortalBackupRole",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": ["ec2.amazonaws.com", "ecs-tasks.amazonaws.com"]
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "CompanyPortalS3BackupPolicy",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "AllowS3BackupOperations",
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:PutObject",
+                    "s3:GetObject",
+                    "s3:ListBucket"
+                  ],
+                  "Resource": [
+                    { "Fn::Sub": "arn:aws:s3:::${BucketName}" },
+                    { "Fn::Sub": "arn:aws:s3:::${BucketName}/backups/*" }
+                  ]
+                }
+              ]
+            }
+          }
+        ],
+        "Tags": [
+          { "Key": "Project", "Value": "CompanyPortal" }
+        ]
+      }
+    }
+  },
+  "Outputs": {
+    "BucketArn": {
+      "Value": { "Fn::GetAtt": ["PostgresBackupBucket", "Arn"] },
+      "Description": "ARN of the private S3 backup bucket"
+    },
+    "KmsKeyArn": {
+      "Value": { "Fn::GetAtt": ["PostgresBackupKmsKey", "Arn"] },
+      "Description": "ARN of the KMS encryption key"
+    },
+    "BackupRoleArn": {
+      "Value": { "Fn::GetAtt": ["CompanyPortalBackupRole", "Arn"] },
+      "Description": "ARN of the least-privilege IAM backup role"
+    }
+  }
+}

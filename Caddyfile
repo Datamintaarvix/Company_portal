@@ -1,0 +1,48 @@
+portal.datamintaarvix.com {
+    # --------------------------------------------------------------------------
+    # Security Response Headers
+    # --------------------------------------------------------------------------
+    header {
+        # HTTP Strict Transport Security (HSTS)
+        # Configured without includeSubDomains or preload for initial rollout safety
+        Strict-Transport-Security "max-age=31536000"
+
+        # Content Security Policy (CSP)
+        # Tailored strictly to frontend requirements:
+        # - 'self' for all origin resources
+        # - 'unsafe-inline' for script-src to support modal inline onclick handlers in dashboard.html
+        # - 'unsafe-inline' for style-src to support UI inline style attributes in templates
+        # - 'none' for object-src and frame-ancestors to prevent clickjacking & plugin embedding
+        Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; object-src 'none'; base-uri 'self'; form-action 'self';"
+
+        # Clickjacking defense (supplement to frame-ancestors 'none')
+        X-Frame-Options "DENY"
+
+        # Prevent MIME-type sniffing
+        X-Content-Type-Options "nosniff"
+
+        # Control referrer leakage
+        Referrer-Policy "strict-origin-when-cross-origin"
+
+        # Restrict dangerous browser features
+        Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+
+        # Strip server header to avoid software enumeration
+        -Server
+    }
+
+    # --------------------------------------------------------------------------
+    # Reverse Proxy to Internal FastAPI Application Container
+    # --------------------------------------------------------------------------
+    reverse_proxy app:8000
+
+    # High-efficiency compression
+    encode zstd gzip
+
+    # Production JSON Access Logs
+    log {
+        output stdout
+        format json
+        level INFO
+    }
+}

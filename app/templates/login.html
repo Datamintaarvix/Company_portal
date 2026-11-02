@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In &mdash; Company Employee Portal</title>
+  <link rel="stylesheet" href="/static/css/portal.css">
+</head>
+<body class="login-body">
+  <main class="login-card" role="main">
+    <div class="login-header">
+      <!-- Corporate Logo Placeholder -->
+      <div class="brand-badge" aria-hidden="true">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+        </svg>
+      </div>
+      <h1 class="login-title">Company Employee Portal</h1>
+      <p class="login-subtitle">Sign in to access corporate resources and services</p>
+    </div>
+
+    <!-- Alert Banner Container -->
+    <div id="alertContainer" role="alert" aria-live="polite"></div>
+
+    <!-- Login Form -->
+    <form id="loginForm" novalidate>
+      <div class="form-group">
+        <label for="emailInput" class="form-label">Corporate Email Address</label>
+        <div class="input-wrapper">
+          <input
+            type="email"
+            id="emailInput"
+            name="email"
+            class="form-input"
+            placeholder="name@company.com"
+            autocomplete="username"
+            required
+            aria-required="true"
+          >
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="passwordInput" class="form-label">Password</label>
+        <div class="input-wrapper">
+          <input
+            type="password"
+            id="passwordInput"
+            name="password"
+            class="form-input"
+            placeholder="••••••••••••"
+            autocomplete="current-password"
+            required
+            aria-required="true"
+          >
+          <button
+            type="button"
+            id="togglePasswordBtn"
+            class="password-toggle-btn"
+            aria-label="Toggle password visibility"
+          >Show</button>
+        </div>
+      </div>
+
+      <button type="submit" id="loginBtn" class="btn-primary">
+        <span id="loginBtnText">Sign In</span>
+        <span id="loginBtnSpinner" class="spinner" style="display: none;" aria-hidden="true"></span>
+      </button>
+    </form>
+
+    <footer style="margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-light);">
+      &copy; Company Portal. Secure authentication with Argon2id &amp; HTTP-only sessions.
+    </footer>
+  </main>
+
+  <script src="/static/js/portal.js"></script>
+</body>
+</html>

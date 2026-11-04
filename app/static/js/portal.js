@@ -12,6 +12,15 @@ function getCookie(name) {
   return null;
 }
 
+// Resolve the CSRF token cookie name from server-rendered meta tag, with fallback
+function getCsrfCookieName() {
+  const meta = document.querySelector('meta[name="csrf-cookie-name"]');
+  if (meta && meta.content && !meta.content.startsWith('{{')) {
+    return meta.content.trim();
+  }
+  return 'csrf_token';
+}
+
 // Wrapper around window.fetch with automatic credentials, CSRF header, and 401 handling
 async function apiFetch(url, options = {}) {
   const config = {
@@ -26,7 +35,8 @@ async function apiFetch(url, options = {}) {
   // State-changing requests attach X-CSRF-Token from cookie
   const method = (config.method || 'GET').toUpperCase();
   if (['POST', 'PATCH', 'PUT', 'DELETE'].includes(method)) {
-    const csrfToken = getCookie('csrf_token');
+    const configuredName = getCsrfCookieName();
+    const csrfToken = getCookie(configuredName) || getCookie('csrf_token') || getCookie('csrf_token_staging') || getCookie('csrf_token_prod');
     if (csrfToken) {
       config.headers['X-CSRF-Token'] = csrfToken;
     }
@@ -329,6 +339,10 @@ function renderProfileView(user) {
   document.getElementById('profRole').className = `role-pill role-${user.role}`;
   document.getElementById('profStatus').textContent = user.is_active ? 'Active' : 'Inactive';
   document.getElementById('profStatus').className = `status-pill status-${user.is_active ? 'active' : 'inactive'}`;
+  const profJoining = document.getElementById('profJoiningDate');
+  if (profJoining) {
+    profJoining.textContent = user.date_of_joining || '—';
+  }
   document.getElementById('profCreated').textContent = new Date(user.created_at).toLocaleDateString();
 
   // Self-Service Edit Form
@@ -511,6 +525,10 @@ async function viewEmployeeDetail(employeeId) {
     document.getElementById('detailEmpDept').textContent = emp.department || 'None';
     document.getElementById('detailEmpRole').textContent = emp.role;
     document.getElementById('detailEmpStatus').textContent = emp.is_active ? 'Active' : 'Inactive';
+    const detailJoining = document.getElementById('detailEmpJoiningDate');
+    if (detailJoining) {
+      detailJoining.textContent = emp.date_of_joining || '—';
+    }
     document.getElementById('detailEmpCreated').textContent = new Date(emp.created_at).toLocaleString();
     openModal('detailModal');
   } catch (err) {
@@ -620,16 +638,33 @@ function setupProvisionForm() {
   const form = document.getElementById('provisionForm');
   if (!form) return;
 
+  const joiningInput = document.getElementById('provJoiningDateInput');
+  if (joiningInput) {
+    const today = new Date().toISOString().split('T')[0];
+    joiningInput.max = today;
+    if (!joiningInput.value) {
+      joiningInput.value = today;
+    }
+  }
+
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     const alertBox = document.getElementById('provisionAlert');
     alertBox.innerHTML = '';
+
+    const joiningInputEl = document.getElementById('provJoiningDateInput');
+    const joiningVal = joiningInputEl ? joiningInputEl.value : '';
+    if (!joiningVal) {
+      alertBox.innerHTML = '<div class="alert alert-error">Please select a valid date of joining.</div>';
+      return;
+    }
 
     const payload = {
       employee_code: document.getElementById('provCodeInput').value.trim(),
       name: document.getElementById('provNameInput').value.trim(),
       email: document.getElementById('provEmailInput').value.trim(),
       department: document.getElementById('provDeptInput').value.trim() || null,
+      date_of_joining: joiningVal,
       role: document.getElementById('provRoleSelect').value,
       password: document.getElementById('provPasswordInput').value,
     };
@@ -646,6 +681,9 @@ function setupProvisionForm() {
         </div>
       `;
       form.reset();
+      if (joiningInputEl) {
+        joiningInputEl.value = new Date().toISOString().split('T')[0];
+      }
     } catch (err) {
       alertBox.innerHTML = `<div class="alert alert-error">${err.message}</div>`;
     }

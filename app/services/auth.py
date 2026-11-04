@@ -61,6 +61,7 @@ def provision_employee(db: Session, data: EmployeeCreate) -> Employee:
         role=data.role.lower(),
         password_hash=hashed_pw,
         is_active=True,
+        date_of_joining=data.date_of_joining,
     )
     db.add(new_employee)
     db.commit()

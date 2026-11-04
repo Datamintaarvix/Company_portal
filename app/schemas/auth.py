@@ -1,8 +1,8 @@
 """Pydantic schemas for authentication and employee profiles."""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
 
 class LoginRequest(BaseModel):
@@ -34,6 +34,7 @@ class EmployeeProfileResponse(BaseModel):
     role: str
     is_active: bool
     created_at: datetime
+    date_of_joining: Optional[date] = None
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -57,3 +58,11 @@ class EmployeeCreate(BaseModel):
     department: Optional[str] = Field(None, max_length=100)
     role: str = Field("employee", description="Role: employee, hr, or admin")
     password: str = Field(..., min_length=8)
+    date_of_joining: date = Field(..., description="Official date of joining (YYYY-MM-DD)")
+
+    @field_validator("date_of_joining")
+    @classmethod
+    def validate_joining_date(cls, v: date) -> date:
+        if v > date.today():
+            raise ValueError("Date of joining cannot be in the future")
+        return v

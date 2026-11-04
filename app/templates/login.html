@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign In &mdash; Company Employee Portal</title>
+  <title>DATAMINT AARVIX | Enterprise HRMS</title>
+  <meta name="csrf-cookie-name" content="{{ csrf_cookie_name or 'csrf_token' }}">
   <link rel="stylesheet" href="/static/css/portal.css">
 </head>
 <body class="login-body">
   <main class="login-card" role="main">
     <div class="login-header">
-      <!-- Corporate Logo Placeholder -->
-      <div class="brand-badge" aria-hidden="true">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-        </svg>
+      <!-- DATAMINT AARVIX Corporate Logo -->
+      <div class="login-brand-wrapper brand-badge">
+        <img
+          src="/static/img/datamint-aarvix-logo.jpg"
+          alt="DATAMINT AARVIX Enterprise HRMS"
+          class="login-brand-logo"
+        >
       </div>
-      <h1 class="login-title">Company Employee Portal</h1>
-      <p class="login-subtitle">Sign in to access corporate resources and services</p>
     </div>
 
     <!-- Alert Banner Container -->
@@ -69,7 +70,7 @@
     </form>
 
     <footer style="margin-top: 24px; text-align: center; font-size: 12px; color: var(--text-light);">
-      &copy; Company Portal. Secure authentication with Argon2id &amp; HTTP-only sessions.
+      &copy; DATAMINT AARVIX &bull; Company Employee Portal. Secure authentication with Argon2id &amp; HTTP-only sessions.
     </footer>
   </main>
 

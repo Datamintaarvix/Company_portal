@@ -7,6 +7,7 @@ and hashed with Argon2id before storage.
 
 import getpass
 import sys
+from datetime import date
 from typing import Optional
 from pydantic import EmailStr, TypeAdapter, ValidationError
 
@@ -41,6 +42,23 @@ def _prompt_email(prompt_text: str = "Corporate Email") -> str:
             print("[-] Invalid email address format. Example: user@company.com")
 
 
+def _prompt_date(prompt_text: str = "Date of Joining (YYYY-MM-DD)", default: Optional[date] = None) -> date:
+    """Prompt and validate a calendar date in YYYY-MM-DD format (must not be in the future)."""
+    default_date = default or date.today()
+    default_str = default_date.isoformat()
+    while True:
+        val = input(f"{prompt_text} [{default_str}]: ").strip()
+        val_str = val if val else default_str
+        try:
+            parsed = date.fromisoformat(val_str)
+            if parsed > date.today():
+                print("[-] Date of joining cannot be in the future. Please enter today or a past date.")
+                continue
+            return parsed
+        except ValueError:
+            print("[-] Invalid date format. Please use YYYY-MM-DD (e.g. 2026-01-15).")
+
+
 def _prompt_password(prompt_text: str = "Password") -> str:
     """Prompt securely for a password without echoing, with confirmation and strength checks."""
     while True:
@@ -72,6 +90,7 @@ def create_admin_interactive() -> None:
     name = _prompt_string("Full Name")
     email = _prompt_email("Corporate Email")
     dept = _prompt_string("Department", default="IT Administration")
+    joining_date = _prompt_date("Date of Joining (YYYY-MM-DD)")
     password = _prompt_password("Admin Password")
 
     db = SessionLocal()
@@ -83,6 +102,7 @@ def create_admin_interactive() -> None:
             department=dept,
             role=UserRole.ADMIN.value,
             password=password,
+            date_of_joining=joining_date,
         )
         emp = provision_employee(db, data)
         print("\n[+] SUCCESS: Administrator account provisioned successfully.")
@@ -92,6 +112,7 @@ def create_admin_interactive() -> None:
         print(f"    - Email:         {emp.email}")
         print(f"    - Role:          {emp.role}")
         print(f"    - Department:    {emp.department}")
+        print(f"    - Joining Date:  {emp.date_of_joining}")
     except ValueError as exc:
         print(f"\n[-] ERROR: Failed to provision account: {exc}")
         sys.exit(1)
@@ -112,6 +133,7 @@ def create_employee_interactive() -> None:
     name = _prompt_string("Full Name")
     email = _prompt_email("Corporate Email")
     dept = _prompt_string("Department", default="Engineering")
+    joining_date = _prompt_date("Date of Joining (YYYY-MM-DD)")
 
     while True:
         role = _prompt_string("Role (employee, hr, admin)", default="employee").lower()
@@ -130,6 +152,7 @@ def create_employee_interactive() -> None:
             department=dept,
             role=role,
             password=password,
+            date_of_joining=joining_date,
         )
         emp = provision_employee(db, data)
         print(f"\n[+] SUCCESS: {role.capitalize()} account provisioned successfully.")
@@ -138,6 +161,7 @@ def create_employee_interactive() -> None:
         print(f"    - Name:          {emp.name}")
         print(f"    - Email:         {emp.email}")
         print(f"    - Role:          {emp.role}")
+        print(f"    - Joining Date:  {emp.date_of_joining}")
     except ValueError as exc:
         print(f"\n[-] ERROR: Failed to provision account: {exc}")
         sys.exit(1)

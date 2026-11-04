@@ -17,10 +17,11 @@ Tests cover:
 
 import os
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Generator
 import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 from sqlalchemy import create_engine, select, text
 from sqlalchemy.engine import URL, make_url
 from sqlalchemy.orm import Session, sessionmaker
@@ -32,8 +33,9 @@ from app.db.base import Base
 from app.db.session import get_db
 from app.main import app
 from app.models.employee import Employee, UserRole
+from app.models.leave import LeaveBalance
 from app.models.session import Session as DbSession
-from app.schemas.auth import EmployeeCreate
+from app.schemas.auth import EmployeeCreate, EmployeeProfileResponse
 from app.services.auth import provision_employee
 from app.services.rate_limiter import login_rate_limiter
 
@@ -622,11 +624,13 @@ def test_provisioning_employee_and_constraints():
             department="Finance",
             role="employee",
             password="ValidPassword123!",
+            date_of_joining=date(2026, 1, 15),
         )
         emp = provision_employee(db, data)
         assert emp.id is not None
         assert emp.password_hash.startswith("$argon2")
         assert verify_password("ValidPassword123!", emp.password_hash)
+        assert emp.date_of_joining == date(2026, 1, 15)
 
         # 2. Duplicate email rejected
         with pytest.raises(ValueError, match="already exists"):
@@ -638,6 +642,7 @@ def test_provisioning_employee_and_constraints():
                     email=email,
                     role="employee",
                     password="ValidPassword123!",
+                    date_of_joining=date(2026, 1, 15),
                 ),
             )
 
@@ -651,6 +656,7 @@ def test_provisioning_employee_and_constraints():
                     email="another@company.com",
                     role="employee",
                     password="ValidPassword123!",
+                    date_of_joining=date(2026, 1, 15),
                 ),
             )
 
@@ -664,6 +670,7 @@ def test_provisioning_employee_and_constraints():
                     email="another2@company.com",
                     role="superadmin",
                     password="ValidPassword123!",
+                    date_of_joining=date(2026, 1, 15),
                 ),
             )
 
@@ -677,6 +684,7 @@ def test_provisioning_employee_and_constraints():
                     email="another3@company.com",
                     role="employee",
                     password="short",
+                    date_of_joining=date(2026, 1, 15),
                 ),
             )
 
@@ -684,3 +692,114 @@ def test_provisioning_employee_and_constraints():
         db.query(Employee).filter(Employee.email.in_([email, "another@company.com", "another2@company.com", "another3@company.com"])).delete(synchronize_session=False)
         db.commit()
         db.close()
+
+
+def test_provision_employee_with_valid_joining_date_persists_and_creates_no_leave_balances():
+    """Verify that provisioning persists date_of_joining and strictly DOES NOT create leave balances."""
+    db = TestSessionLocal()
+    code = "EMP-DOJ-001"
+    email = "doj.test@company.com"
+    joining_date = date(2026, 1, 20)
+
+    try:
+        data = EmployeeCreate(
+            employee_code=code,
+            name="Joining Date Staff",
+            email=email,
+            department="Engineering",
+            role="employee",
+            password="ValidPassword123!",
+            date_of_joining=joining_date,
+        )
+        emp = provision_employee(db, data)
+        assert emp.id is not None
+        assert emp.date_of_joining == joining_date
+
+        # Query LeaveBalance table to ensure ZERO leave balances were created (Phase 3.1A constraint)
+        leave_balances = db.query(LeaveBalance).filter(LeaveBalance.employee_id == emp.id).all()
+        assert len(leave_balances) == 0, "No leave balances should be initialized during Phase 3.1A"
+
+    finally:
+        db.query(Employee).filter(Employee.email == email).delete(synchronize_session=False)
+        db.commit()
+        db.close()
+
+
+def test_employee_creation_missing_joining_date_rejected():
+    """Verify EmployeeCreate schema strictly requires date_of_joining."""
+    with pytest.raises(ValidationError) as exc_info:
+        EmployeeCreate(
+            employee_code="EMP-NO-DOJ",
+            name="Missing DOJ",
+            email="no.doj@company.com",
+            role="employee",
+            password="ValidPassword123!",
+        )
+    assert "date_of_joining" in str(exc_info.value)
+
+
+def test_employee_creation_future_joining_date_rejected():
+    """Verify EmployeeCreate schema rejects future joining dates."""
+    future_date = date.today() + timedelta(days=1)
+    with pytest.raises(ValidationError) as exc_info:
+        EmployeeCreate(
+            employee_code="EMP-FUT-DOJ",
+            name="Future DOJ",
+            email="future.doj@company.com",
+            role="employee",
+            password="ValidPassword123!",
+            date_of_joining=future_date,
+        )
+    assert "Date of joining cannot be in the future" in str(exc_info.value)
+
+
+def test_existing_employee_with_null_joining_date_remains_readable():
+    """Verify existing employees with NULL date_of_joining remain readable and valid."""
+    db = TestSessionLocal()
+    code = "EMP-NULL-DOJ"
+    email = "null.doj@company.com"
+
+    try:
+        legacy_emp = Employee(
+            employee_code=code,
+            name="Legacy Staff",
+            email=email,
+            role=UserRole.EMPLOYEE.value,
+            password_hash=get_password_hash("ValidPassword123!"),
+            is_active=True,
+            date_of_joining=None,
+        )
+        db.add(legacy_emp)
+        db.commit()
+        db.refresh(legacy_emp)
+
+        assert legacy_emp.id is not None
+        assert legacy_emp.date_of_joining is None
+
+        # Verify schema serialization accommodates NULL
+        profile = EmployeeProfileResponse.model_validate(legacy_emp)
+        assert profile.date_of_joining is None
+        assert profile.email == email
+        assert profile.name == "Legacy Staff"
+
+    finally:
+        db.query(Employee).filter(Employee.email == email).delete(synchronize_session=False)
+        db.commit()
+        db.close()
+
+
+def test_cli_prompt_date_validation(monkeypatch):
+    """Verify CLI prompt for date_of_joining correctly parses and validates dates."""
+    from app.cli import _prompt_date
+    import io
+
+    # 1. Valid date entry
+    monkeypatch.setattr("sys.stdin", io.StringIO("2026-01-15\n"))
+    result = _prompt_date("Date of Joining")
+    assert result == date(2026, 1, 15)
+
+    # 2. Future date followed by valid date
+    future_str = (date.today() + timedelta(days=5)).isoformat()
+    monkeypatch.setattr("sys.stdin", io.StringIO(f"{future_str}\n2026-02-01\n"))
+    result2 = _prompt_date("Date of Joining")
+    assert result2 == date(2026, 2, 1)

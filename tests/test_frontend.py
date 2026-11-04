@@ -18,6 +18,9 @@ def test_login_page_renders_cleanly():
     assert "Company Employee Portal" in html
     assert "Sign In" in html
     assert "brand-badge" in html
+    assert "<title>DATAMINT AARVIX | Enterprise HRMS</title>" in html
+    assert "/static/img/datamint-aarvix-logo.jpg" in html
+    assert "login-brand-logo" in html
 
     # Accessible form controls
     assert 'id="loginForm"' in html
@@ -42,6 +45,9 @@ def test_dashboard_page_renders_shell():
     html = response.text
 
     # Application shell
+    assert "<title>DATAMINT AARVIX | Enterprise HRMS</title>" in html
+    assert "/static/img/datamint-aarvix-logo.jpg" in html
+    assert "sidebar-brand-logo" in html
     assert 'id="dashboardRoot"' in html
     assert 'id="appSidebar"' in html
     assert 'id="sidebarNavContainer"' in html
@@ -71,6 +77,11 @@ def test_dashboard_page_renders_shell():
     assert 'id="statusModal"' in html
     assert 'id="correctAttendanceModal"' in html
 
+    # Phase 3.1A Joining Date elements
+    assert 'id="provJoiningDateInput"' in html
+    assert 'id="profJoiningDate"' in html
+    assert 'id="detailEmpJoiningDate"' in html
+
 
 def test_portal_redirect():
     """Verify that GET /portal redirects to /dashboard."""
@@ -93,6 +104,9 @@ def test_static_css_served_correctly():
     assert ".btn-punch-out" in css
     assert ".status-present" in css
     assert ".status-incomplete" in css
+    assert ".login-brand-logo" in css
+    assert ".sidebar-brand-logo" in css
+    assert "aspect-ratio" in css
 
 
 def test_static_js_served_correctly():
@@ -102,6 +116,8 @@ def test_static_js_served_correctly():
     js = response.text
     assert "apiFetch" in js
     assert "getCookie" in js
+    assert "getCsrfCookieName" in js
+    assert 'meta[name="csrf-cookie-name"]' in js
     assert "initLoginPage" in js
     assert "initDashboard" in js
     assert "loadTodayAttendance" in js
@@ -109,6 +125,38 @@ def test_static_js_served_correctly():
     assert "loadCompanyAttendance" in js
     assert "setupCorrectionForm" in js
     assert "startIstClock" in js
+    assert "provJoiningDateInput" in js
+    assert "date_of_joining" in js
+
+
+def test_csrf_cookie_name_rendered_in_templates(monkeypatch):
+    """Verify that /login and /dashboard dynamically render the configured CSRF cookie name.
+
+    Tests development ('csrf_token'), staging ('csrf_token_staging'), and
+    production ('csrf_token_prod') cookie configurations.
+    """
+    import app.routers.views as views_mod
+
+    # 1. Development default configuration
+    monkeypatch.setattr(views_mod.settings, "CSRF_COOKIE_NAME", "csrf_token")
+    login_resp = client.get("/login")
+    dash_resp = client.get("/dashboard")
+    assert '<meta name="csrf-cookie-name" content="csrf_token">' in login_resp.text
+    assert '<meta name="csrf-cookie-name" content="csrf_token">' in dash_resp.text
+
+    # 2. Staging configuration
+    monkeypatch.setattr(views_mod.settings, "CSRF_COOKIE_NAME", "csrf_token_staging")
+    login_resp = client.get("/login")
+    dash_resp = client.get("/dashboard")
+    assert '<meta name="csrf-cookie-name" content="csrf_token_staging">' in login_resp.text
+    assert '<meta name="csrf-cookie-name" content="csrf_token_staging">' in dash_resp.text
+
+    # 3. Production configuration
+    monkeypatch.setattr(views_mod.settings, "CSRF_COOKIE_NAME", "csrf_token_prod")
+    login_resp = client.get("/login")
+    dash_resp = client.get("/dashboard")
+    assert '<meta name="csrf-cookie-name" content="csrf_token_prod">' in login_resp.text
+    assert '<meta name="csrf-cookie-name" content="csrf_token_prod">' in dash_resp.text
 
 
 def test_no_credentials_or_hashes_exposed_in_templates_or_assets():
@@ -119,3 +167,11 @@ def test_no_credentials_or_hashes_exposed_in_templates_or_assets():
         assert "$argon2" not in content
         assert "secret_key" not in content
         assert "postgres_password" not in content
+
+
+def test_static_logo_image_served():
+    """Verify that the official DATAMINT AARVIX company logo is served with correct headers."""
+    response = client.get("/static/img/datamint-aarvix-logo.jpg")
+    assert response.status_code == 200
+    assert response.headers["content-type"] in ("image/jpeg", "image/jpg")
+    assert len(response.content) > 10000

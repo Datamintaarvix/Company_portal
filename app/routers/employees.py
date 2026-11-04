@@ -181,6 +181,11 @@ async def update_employee(
                 status_code=status.HTTP_403_FORBIDDEN,
                 detail="Employees are not authorized to modify their department",
             )
+        if payload.date_of_joining is not None:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Employees are not authorized to modify their date of joining",
+            )
         if payload.name is not None:
             target.name = payload.name.strip()
     else:
@@ -189,6 +194,8 @@ async def update_employee(
             target.name = payload.name.strip()
         if payload.department is not None:
             target.department = payload.department.strip() if payload.department else None
+        if payload.date_of_joining is not None:
+            target.date_of_joining = payload.date_of_joining
 
     db.commit()
     db.refresh(target)

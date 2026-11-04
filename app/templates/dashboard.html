@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard &mdash; Company Employee Portal</title>
+  <title>DATAMINT AARVIX | Enterprise HRMS</title>
+  <meta name="csrf-cookie-name" content="{{ csrf_cookie_name or 'csrf_token' }}">
   <link rel="stylesheet" href="/static/css/portal.css">
 </head>
 <body id="dashboardRoot">
@@ -11,12 +12,13 @@
     <!-- Sidebar -->
     <aside class="app-sidebar" id="appSidebar">
       <div class="sidebar-header">
-        <div class="sidebar-brand-badge" aria-hidden="true">
-          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
-          </svg>
+        <div class="sidebar-brand-wrapper">
+          <img
+            src="/static/img/datamint-aarvix-logo.jpg"
+            alt="DATAMINT AARVIX Enterprise HRMS"
+            class="sidebar-brand-logo"
+          >
         </div>
-        <span class="sidebar-title">Company Portal</span>
       </div>
 
       <!-- Navigation Links Container (Populated based on role) -->
@@ -44,7 +46,14 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
           </button>
-          <h2 class="header-title" id="headerTitle">My Profile</h2>
+          <div class="header-title-container">
+            <nav class="header-breadcrumb" aria-label="Breadcrumb">
+              <span class="breadcrumb-item">DATAMINT AARVIX</span>
+              <span class="breadcrumb-separator" aria-hidden="true">/</span>
+              <span class="breadcrumb-item breadcrumb-current">Enterprise HRMS</span>
+            </nav>
+            <h2 class="header-title" id="headerTitle">My Profile</h2>
+          </div>
         </div>
 
         <div class="user-badge-group">
@@ -90,6 +99,10 @@
                   <span class="profile-field-value"><span id="profStatus" class="status-pill status-active">Active</span></span>
                 </div>
                 <div class="profile-field">
+                  <span class="profile-field-label">Date of Joining</span>
+                  <span class="profile-field-value" id="profJoiningDate">—</span>
+                </div>
+                <div class="profile-field">
                   <span class="profile-field-label">Registered Since</span>
                   <span class="profile-field-value" id="profCreated">—</span>
                 </div>
@@ -125,11 +138,43 @@
               <h3 class="card-title">Security &amp; Session Information</h3>
             </div>
             <div class="card-body">
-              <div style="font-size: 14px; line-height: 1.6; color: var(--text-main);">
-                <p style="margin-bottom: 12px;"><strong>Session Type:</strong> PostgreSQL Server-Side Session with HTTP-Only Cookie</p>
-                <p style="margin-bottom: 12px;"><strong>Session Expiry Policy:</strong> 120 Minutes of Inactivity</p>
-                <p style="margin-bottom: 12px;"><strong>Protection Measures:</strong> Double-Submit / Session-Bound CSRF Token Header Validation, Argon2id Password Encryption</p>
-                <p style="margin-bottom: 0;"><strong>Active State:</strong> Verified Against Database on Every Request</p>
+              <div class="security-grid">
+                <div class="security-card">
+                  <div class="security-card-icon" aria-hidden="true">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                  </div>
+                  <div class="security-card-content">
+                    <span class="security-card-label">Session Type</span>
+                    <span class="security-card-value">PostgreSQL Server-Side Session with HTTP-Only Cookie</span>
+                  </div>
+                </div>
+                <div class="security-card">
+                  <div class="security-card-icon" aria-hidden="true">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  </div>
+                  <div class="security-card-content">
+                    <span class="security-card-label">Session Expiry Policy</span>
+                    <span class="security-card-value">120 Minutes of Inactivity</span>
+                  </div>
+                </div>
+                <div class="security-card">
+                  <div class="security-card-icon" aria-hidden="true">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                  </div>
+                  <div class="security-card-content">
+                    <span class="security-card-label">Protection Measures</span>
+                    <span class="security-card-value">Double-Submit / Session-Bound CSRF Token Header Validation, Argon2id Password Encryption</span>
+                  </div>
+                </div>
+                <div class="security-card">
+                  <div class="security-card-icon" aria-hidden="true">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                  </div>
+                  <div class="security-card-content">
+                    <span class="security-card-label">Active State</span>
+                    <span class="security-card-value">Verified Against Database on Every Request</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -229,6 +274,10 @@
                   <input type="text" id="provDeptInput" class="form-input" placeholder="Engineering">
                 </div>
                 <div class="form-group">
+                  <label for="provJoiningDateInput" class="form-label">Date of Joining *</label>
+                  <input type="date" id="provJoiningDateInput" class="form-input" required>
+                </div>
+                <div class="form-group">
                   <label for="provRoleSelect" class="form-label">Role *</label>
                   <select id="provRoleSelect" class="form-select" required>
                     <!-- Options populated based on role in portal.js -->
@@ -271,7 +320,7 @@
           <!-- Live IST Clock & Shift Status Hero Card -->
           <div class="live-clock-card">
             <div class="live-clock-details">
-              <span class="live-clock-label">Company Timezone (IST)</span>
+              <span class="live-clock-label">DATAMINT AARVIX Timezone (IST)</span>
               <span id="istLiveClock" class="live-clock-time">--:--:-- -- IST</span>
               <span id="todayWorkDateText" class="live-clock-date">Loading current date...</span>
             </div>
@@ -388,7 +437,7 @@
         <section id="attendanceAdminSection" class="content-section">
           <div class="card">
             <div class="card-header">
-              <h3 class="card-title">Company Attendance Directory &amp; Audit</h3>
+              <h3 class="card-title">DATAMINT AARVIX Attendance Directory &amp; Audit</h3>
             </div>
             <div class="card-body" style="padding-bottom: 0;">
               <!-- Toolbar / Filters -->
@@ -632,7 +681,7 @@
           <div class="section-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin-bottom: 24px;">
             <div>
               <h2 id="leaveAdminHeading" class="section-title" style="font-size: 20px; font-weight: 700; color: var(--text-main);">Pending Leave Approvals</h2>
-              <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Review and action submitted leave applications from company staff.</p>
+              <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Review and action submitted leave applications from DATAMINT AARVIX staff.</p>
             </div>
             <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
               <button id="btnOpenAdjustBalanceModal" class="btn-secondary" type="button" aria-label="Adjust employee leave balance">
@@ -764,6 +813,10 @@
           <div class="profile-field">
             <span class="profile-field-label">Status</span>
             <span class="profile-field-value" id="detailEmpStatus">—</span>
+          </div>
+          <div class="profile-field">
+            <span class="profile-field-label">Date of Joining</span>
+            <span class="profile-field-value" id="detailEmpJoiningDate">—</span>
           </div>
           <div class="profile-field" style="grid-column: 1 / -1;">
             <span class="profile-field-label">Created At</span>

@@ -449,6 +449,14 @@ def test_employee_self_service_update_boundaries(setup_rbac_users):
     )
     assert resp_dept.status_code == 403
 
+    # Forbidden: update own date of joining
+    resp_doj = emp_client.patch(
+        f"/employees/{emp_id}",
+        json={"date_of_joining": "2025-01-01"},
+        headers={"X-CSRF-Token": csrf},
+    )
+    assert resp_doj.status_code == 403
+
     # Forbidden: update someone else's record
     resp_other = emp_client.patch(
         f"/employees/{target_id}",
@@ -476,15 +484,16 @@ def test_hr_can_access_directory_and_permitted_fields(setup_rbac_users):
     assert resp_view.status_code == 200
     assert resp_view.json()["email"] == TARGET_EMAIL
 
-    # Update name and department
+    # Update name, department, and date_of_joining
     resp_update = hr_client.patch(
         f"/employees/{target_id}",
-        json={"name": "Target Updated by HR", "department": "Accounting"},
+        json={"name": "Target Updated by HR", "department": "Accounting", "date_of_joining": "2026-02-01"},
         headers={"X-CSRF-Token": csrf},
     )
     assert resp_update.status_code == 200
     assert resp_update.json()["name"] == "Target Updated by HR"
     assert resp_update.json()["department"] == "Accounting"
+    assert resp_update.json()["date_of_joining"] == "2026-02-01"
 
 
 # 8. HR cannot access admin endpoints
@@ -523,6 +532,7 @@ def test_hr_provisioning_restrictions(setup_rbac_users):
             "department": "IT",
             "role": "admin",
             "password": TEST_PASSWORD,
+            "date_of_joining": "2026-01-15",
         },
         headers={"X-CSRF-Token": csrf},
     )
@@ -539,6 +549,7 @@ def test_hr_provisioning_restrictions(setup_rbac_users):
             "department": "Operations",
             "role": "employee",
             "password": TEST_PASSWORD,
+            "date_of_joining": "2026-01-15",
         },
         headers={"X-CSRF-Token": csrf},
     )

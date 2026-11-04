@@ -257,11 +257,46 @@ def test_employee_creation_and_defaults():
         assert employee.created_at is not None
         assert employee.updated_at is not None
         assert employee.password_hash is None
+        assert employee.date_of_joining is None
 
     finally:
         # Clean up after test
         try:
             db.query(Employee).filter(Employee.email == unique_email).delete()
+            db.commit()
+        finally:
+            db.close()
+
+
+def test_employee_date_of_joining_persistence():
+    """Verify that date_of_joining is persisted and retrieved as a python date object."""
+    from datetime import date
+    db = TestSessionLocal()
+    code = "EMP-TEST-DOJ-DB"
+    email = "doj.db@example.com"
+    test_date = date(2026, 1, 10)
+
+    try:
+        db.query(Employee).filter(Employee.email == email).delete()
+        db.commit()
+
+        emp = Employee(
+            employee_code=code,
+            name="DOJ DB Tester",
+            email=email,
+            role=UserRole.EMPLOYEE.value,
+            date_of_joining=test_date,
+        )
+        db.add(emp)
+        db.commit()
+        db.refresh(emp)
+
+        assert emp.id is not None
+        assert emp.date_of_joining == test_date
+
+    finally:
+        try:
+            db.query(Employee).filter(Employee.email == email).delete()
             db.commit()
         finally:
             db.close()

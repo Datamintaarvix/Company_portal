@@ -1,5 +1,6 @@
 """Frontend view routers serving HTML templates for Login and Dashboard."""
 
+from pathlib import Path
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
@@ -7,7 +8,8 @@ from fastapi.templating import Jinja2Templates
 from app.core.config import get_settings
 
 router = APIRouter(tags=["Frontend Views"], include_in_schema=False)
-templates = Jinja2Templates(directory="app/templates")
+TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "templates"
+templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
 settings = get_settings()
 
 

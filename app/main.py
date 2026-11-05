@@ -6,6 +6,7 @@ handlers, and defines core root and health check endpoints.
 
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Any, Optional
 from fastapi import FastAPI, HTTPException, status
 from fastapi.staticfiles import StaticFiles
@@ -61,8 +62,9 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Mount static assets
-app.mount("/static", StaticFiles(directory="app/static"), name="static")
+# Mount static assets with absolute path resolution for serverless runtime safety
+STATIC_DIR = Path(__file__).resolve().parent / "static"
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 # Register routers
 app.include_router(views_router)

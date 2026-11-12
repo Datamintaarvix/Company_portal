@@ -212,20 +212,20 @@ function setupRoleNavigation(role) {
   // Employee Navigation
   navHtml += `
     <div class="nav-section-title">Personal</div>
-    <div class="nav-item active" data-target="profileSection">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+    <div class="nav-item active" data-target="profileSection" role="button" tabindex="0">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
       <span>My Profile</span>
     </div>
-    <div class="nav-item" data-target="accountSection">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+    <div class="nav-item" data-target="accountSection" role="button" tabindex="0">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
       <span>My Account</span>
     </div>
-    <div class="nav-item" data-target="attendanceSection">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+    <div class="nav-item" data-target="attendanceSection" role="button" tabindex="0">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
       <span>Attendance</span>
     </div>
-    <div class="nav-item" data-target="leavesSection">
-      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+    <div class="nav-item" data-target="leavesSection" role="button" tabindex="0">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
       <span>My Leaves</span>
     </div>
   `;
@@ -234,20 +234,20 @@ function setupRoleNavigation(role) {
   if (role === 'hr' || role === 'admin') {
     navHtml += `
       <div class="nav-section-title" style="margin-top: 16px;">HR Management</div>
-      <div class="nav-item" data-target="directorySection">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
+      <div class="nav-item" data-target="directorySection" role="button" tabindex="0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
         <span>Employee Directory</span>
       </div>
-      <div class="nav-item" data-target="provisionSection">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
+      <div class="nav-item" data-target="provisionSection" role="button" tabindex="0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
         <span>Provision Employee</span>
       </div>
-      <div class="nav-item" data-target="attendanceAdminSection">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+      <div class="nav-item" data-target="attendanceAdminSection" role="button" tabindex="0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
         <span>Attendance Management</span>
       </div>
-      <div class="nav-item" data-target="leavesAdminSection">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      <div class="nav-item" data-target="leavesAdminSection" role="button" tabindex="0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
         <span>Leave Approvals</span>
       </div>
     `;
@@ -257,8 +257,8 @@ function setupRoleNavigation(role) {
   if (role === 'admin') {
     navHtml += `
       <div class="nav-section-title" style="margin-top: 16px;">Administration</div>
-      <div class="nav-item" data-target="adminOverviewSection">
-        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+      <div class="nav-item" data-target="adminOverviewSection" role="button" tabindex="0">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
         <span>Account & Role Ops</span>
       </div>
     `;
@@ -267,10 +267,55 @@ function setupRoleNavigation(role) {
   navContainer.innerHTML = navHtml;
 }
 
+let sidebarNavAbortController = null;
+
 function setupSidebarNavigation() {
   const navContainer = document.getElementById('sidebarNavContainer');
-  navContainer.addEventListener('click', (e) => {
-    const item = e.target.closest('.nav-item');
+  const mobileBtn = document.getElementById('mobileMenuBtn');
+  const sidebar = document.getElementById('appSidebar');
+  const backdrop = document.getElementById('sidebarBackdrop');
+  const closeBtn = document.getElementById('mobileSidebarCloseBtn');
+
+  if (!navContainer) return;
+
+  // Prevent duplicate listener registration if setupSidebarNavigation is called again
+  if (sidebarNavAbortController) {
+    sidebarNavAbortController.abort();
+  }
+  sidebarNavAbortController = new AbortController();
+  const { signal } = sidebarNavAbortController;
+
+  if (mobileBtn) {
+    if (!mobileBtn.hasAttribute('aria-controls')) {
+      mobileBtn.setAttribute('aria-controls', 'appSidebar');
+    }
+    if (!mobileBtn.hasAttribute('aria-expanded')) {
+      mobileBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  function openMobileSidebar() {
+    if (!sidebar) return;
+    sidebar.classList.add('open');
+    if (backdrop) backdrop.classList.add('open');
+    if (mobileBtn) mobileBtn.setAttribute('aria-expanded', 'true');
+    document.body.classList.add('sidebar-open');
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeMobileSidebar(restoreFocus = false) {
+    if (!sidebar) return;
+    const wasOpen = sidebar.classList.contains('open');
+    sidebar.classList.remove('open');
+    if (backdrop) backdrop.classList.remove('open');
+    if (mobileBtn) mobileBtn.setAttribute('aria-expanded', 'false');
+    document.body.classList.remove('sidebar-open');
+    if (restoreFocus && wasOpen && mobileBtn) {
+      mobileBtn.focus();
+    }
+  }
+
+  function activateNavItem(item) {
     if (!item) return;
 
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
@@ -282,7 +327,11 @@ function setupSidebarNavigation() {
     const activeSection = document.getElementById(targetId);
     if (activeSection) {
       activeSection.classList.add('active');
-      document.getElementById('headerTitle').textContent = item.querySelector('span').textContent;
+      const titleSpan = item.querySelector('span');
+      const headerTitle = document.getElementById('headerTitle');
+      if (titleSpan && headerTitle) {
+        headerTitle.textContent = titleSpan.textContent;
+      }
 
       if (targetId === 'directorySection') {
         loadDirectory();
@@ -302,15 +351,79 @@ function setupSidebarNavigation() {
         loadAdminCompoffClaims();
       }
     }
-  });
 
-  // Mobile menu toggle
-  const mobileBtn = document.getElementById('mobileMenuBtn');
-  const sidebar = document.getElementById('appSidebar');
+    // Auto-close mobile/tablet drawer after choosing a destination
+    if (window.innerWidth <= 1024) {
+      closeMobileSidebar(false);
+    }
+  }
+
+  navContainer.addEventListener('click', (e) => {
+    const item = e.target.closest('.nav-item');
+    activateNavItem(item);
+  }, { signal });
+
+  navContainer.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      const item = e.target.closest('.nav-item');
+      if (item) {
+        e.preventDefault();
+        activateNavItem(item);
+      }
+    }
+  }, { signal });
+
+  // Mobile / tablet drawer controls
   if (mobileBtn && sidebar) {
-    mobileBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('open');
-    });
+    mobileBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (sidebar.classList.contains('open')) {
+        closeMobileSidebar(false);
+      } else {
+        openMobileSidebar();
+      }
+    }, { signal });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => closeMobileSidebar(true), { signal });
+  }
+
+  if (backdrop) {
+    backdrop.addEventListener('click', () => closeMobileSidebar(true), { signal });
+  }
+
+  // Outside-click closing (defense-in-depth alongside backdrop click)
+  document.addEventListener('click', (e) => {
+    if (!sidebar || !sidebar.classList.contains('open')) return;
+    if (sidebar.contains(e.target)) return;
+    if (mobileBtn && mobileBtn.contains(e.target)) return;
+    closeMobileSidebar(false);
+  }, { signal });
+
+  // Escape-key closing
+  document.addEventListener('keydown', (e) => {
+    if (
+      e.key === 'Escape' &&
+      sidebar &&
+      sidebar.classList.contains('open') &&
+      !document.querySelector('.modal-backdrop.open')
+    ) {
+      closeMobileSidebar(true);
+    }
+  }, { signal });
+
+  // Reset mobile drawer state when resizing back to desktop width
+  const desktopMq = window.matchMedia('(min-width: 1025px)');
+  const handleViewportChange = (mq) => {
+    if (mq.matches) {
+      closeMobileSidebar(false);
+    }
+  };
+  if (desktopMq.addEventListener) {
+    desktopMq.addEventListener('change', handleViewportChange, { signal });
+  } else if (desktopMq.addListener) {
+    desktopMq.addListener(handleViewportChange);
   }
 }
 

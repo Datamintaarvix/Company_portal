@@ -9,8 +9,11 @@
 </head>
 <body id="dashboardRoot">
   <div class="app-layout">
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" aria-hidden="true"></div>
+
     <!-- Sidebar -->
-    <aside class="app-sidebar" id="appSidebar">
+    <aside class="app-sidebar" id="appSidebar" aria-label="Sidebar Navigation">
       <div class="sidebar-header">
         <div class="sidebar-brand-wrapper">
           <img
@@ -19,6 +22,12 @@
             class="sidebar-brand-logo"
           >
         </div>
+        <button
+          type="button"
+          id="mobileSidebarCloseBtn"
+          class="sidebar-close-btn"
+          aria-label="Close navigation menu"
+        >&times;</button>
       </div>
 
       <!-- Navigation Links Container (Populated based on role) -->
@@ -41,7 +50,14 @@
     <div class="app-main">
       <header class="app-header">
         <div class="header-left">
-          <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Toggle navigation menu">
+          <button
+            type="button"
+            id="mobileMenuBtn"
+            class="mobile-menu-btn"
+            aria-label="Toggle navigation menu"
+            aria-expanded="false"
+            aria-controls="appSidebar"
+          >
             <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
@@ -125,7 +141,7 @@
                   <label for="selfNameInput" class="form-label">Full Name</label>
                   <input type="text" id="selfNameInput" class="form-input" required>
                 </div>
-                <button type="submit" class="btn-primary" style="width: auto; padding: 10px 24px;">Save Changes</button>
+                <button type="submit" class="btn-primary btn-desktop-auto" style="padding: 10px 24px;">Save Changes</button>
               </form>
             </div>
           </div>
@@ -196,7 +212,7 @@
                     class="form-input search-input"
                     placeholder="Search by name, email, or code..."
                   >
-                  <select id="dirDeptSelect" class="form-select" style="width: auto;">
+                  <select id="dirDeptSelect" class="form-select filter-select-auto">
                     <option value="">All Departments</option>
                     <option value="Engineering">Engineering</option>
                     <option value="Human Resources">Human Resources</option>
@@ -204,7 +220,7 @@
                     <option value="Finance">Finance</option>
                     <option value="Operations">Operations</option>
                   </select>
-                  <select id="dirRoleSelect" class="form-select" style="width: auto;">
+                  <select id="dirRoleSelect" class="form-select filter-select-auto">
                     <option value="">All Roles</option>
                     <option value="employee">Employee</option>
                     <option value="hr">HR</option>
@@ -287,7 +303,7 @@
                   <label for="provPasswordInput" class="form-label">Initial Password * (min 8 chars, mixed case + digit)</label>
                   <input type="password" id="provPasswordInput" class="form-input" placeholder="••••••••••••" required>
                 </div>
-                <button type="submit" class="btn-primary" style="width: auto; padding: 11px 28px;">
+                <button type="submit" class="btn-primary btn-desktop-auto" style="padding: 11px 28px;">
                   Provision Account
                 </button>
               </form>
@@ -308,7 +324,7 @@
               <div class="alert alert-warning" style="margin-bottom: 24px;">
                 <strong>Protection Rule:</strong> Self-demotion and self-deactivation are strictly blocked by backend RBAC safeguards to prevent administrator lockout.
               </div>
-              <button class="btn-primary" style="width: auto;" onclick="document.querySelector('[data-target=\'directorySection\']').click();">
+              <button class="btn-primary btn-desktop-auto" onclick="document.querySelector('[data-target=\'directorySection\']').click();">
                 Browse Directory to Manage Staff Roles &amp; Status
               </button>
             </div>
@@ -324,7 +340,7 @@
               <span id="istLiveClock" class="live-clock-time">--:--:-- -- IST</span>
               <span id="todayWorkDateText" class="live-clock-date">Loading current date...</span>
             </div>
-            <div style="text-align: right;">
+            <div class="clock-status-block">
               <span style="font-size: 12px; color: #bfdbfe; font-weight: 600; display: block; margin-bottom: 4px;">PUNCH STATUS</span>
               <span id="todayStatusBadge" class="status-pill" style="font-size: 13px; padding: 4px 12px;">Checking...</span>
             </div>
@@ -361,11 +377,10 @@
                 <input
                   type="text"
                   id="punchNotesInput"
-                  class="form-input"
+                  class="form-input punch-notes-input"
                   placeholder="Optional punch remark (e.g. WFH, client visit)..."
-                  style="max-width: 360px;"
                 >
-                <div style="display: flex; gap: 10px;">
+                <div class="punch-btn-group">
                   <button id="btnCheckIn" class="btn-punch-in" disabled>
                     <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
@@ -391,13 +406,19 @@
             <div class="card-body" style="padding-bottom: 0;">
               <!-- History Toolbar / Filters -->
               <div class="table-toolbar">
-                <div class="table-filters" style="align-items: center;">
-                  <label for="myAttStartDate" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">From:</label>
-                  <input type="date" id="myAttStartDate" class="form-input" style="width: auto;">
-                  <label for="myAttEndDate" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">To:</label>
-                  <input type="date" id="myAttEndDate" class="form-input" style="width: auto;">
-                  <button id="btnFilterMyAtt" class="btn-secondary">Filter</button>
-                  <button id="btnResetMyAtt" class="btn-secondary">Reset</button>
+                <div class="table-filters">
+                  <div class="date-filter-pair">
+                    <label for="myAttStartDate" class="filter-inline-label">From:</label>
+                    <input type="date" id="myAttStartDate" class="form-input filter-date-auto">
+                  </div>
+                  <div class="date-filter-pair">
+                    <label for="myAttEndDate" class="filter-inline-label">To:</label>
+                    <input type="date" id="myAttEndDate" class="form-input filter-date-auto">
+                  </div>
+                  <div class="filter-actions-group">
+                    <button id="btnFilterMyAtt" class="btn-secondary">Filter</button>
+                    <button id="btnResetMyAtt" class="btn-secondary">Reset</button>
+                  </div>
                 </div>
               </div>
 
@@ -442,32 +463,32 @@
             <div class="card-body" style="padding-bottom: 0;">
               <!-- Toolbar / Filters -->
               <div class="table-toolbar">
-                <div class="table-filters" style="flex-wrap: wrap;">
+                <div class="table-filters">
                   <input
                     type="number"
                     id="admAttEmpId"
-                    class="form-input"
+                    class="form-input filter-input-id"
                     placeholder="Emp ID..."
-                    style="width: 100px;"
                   >
                   <input
                     type="text"
                     id="admAttDept"
-                    class="form-input"
+                    class="form-input filter-input-dept"
                     placeholder="Department..."
-                    style="width: 140px;"
                   >
-                  <input type="date" id="admAttStartDate" class="form-input" style="width: auto;" title="Start date">
-                  <input type="date" id="admAttEndDate" class="form-input" style="width: auto;" title="End date">
-                  <select id="admAttStatus" class="form-select" style="width: auto;">
+                  <input type="date" id="admAttStartDate" class="form-input filter-date-auto" title="Start date">
+                  <input type="date" id="admAttEndDate" class="form-input filter-date-auto" title="End date">
+                  <select id="admAttStatus" class="form-select filter-select-auto">
                     <option value="">All Statuses</option>
                     <option value="present">Present</option>
                     <option value="incomplete">Incomplete</option>
                     <option value="half_day">Half Day</option>
                     <option value="absent">Absent</option>
                   </select>
-                  <button id="btnFilterAdmAtt" class="btn-secondary">Apply Filters</button>
-                  <button id="btnResetAdmAtt" class="btn-secondary">Reset</button>
+                  <div class="filter-actions-group">
+                    <button id="btnFilterAdmAtt" class="btn-secondary">Apply Filters</button>
+                    <button id="btnResetAdmAtt" class="btn-secondary">Reset</button>
+                  </div>
                 </div>
               </div>
 
@@ -514,14 +535,14 @@
               <h2 id="leaveSectionHeading" class="section-title" style="font-size: 20px; font-weight: 700; color: var(--text-main);">Leave Management</h2>
               <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Track your leave balances, view submission history, and apply for time off.</p>
             </div>
-            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-              <button id="btnClaimCompoff" class="btn-secondary" type="button" aria-label="Claim compensatory off" style="width: auto; padding: 10px 18px;">
+            <div class="section-header-actions">
+              <button id="btnClaimCompoff" class="btn-secondary btn-desktop-auto" type="button" aria-label="Claim compensatory off" style="padding: 10px 18px;">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <span>Claim Comp-Off</span>
               </button>
-              <button id="btnApplyLeave" class="btn-primary" type="button" aria-label="Apply for time off" style="width: auto; padding: 10px 20px;">
+              <button id="btnApplyLeave" class="btn-primary btn-desktop-auto" type="button" aria-label="Apply for time off" style="padding: 10px 20px;">
                 <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -683,11 +704,11 @@
               <h2 id="leaveAdminHeading" class="section-title" style="font-size: 20px; font-weight: 700; color: var(--text-main);">Pending Leave Approvals</h2>
               <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">Review and action submitted leave applications from DATAMINT AARVIX staff.</p>
             </div>
-            <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-              <button id="btnOpenAdjustBalanceModal" class="btn-secondary" type="button" aria-label="Adjust employee leave balance">
+            <div class="section-header-actions">
+              <button id="btnOpenAdjustBalanceModal" class="btn-secondary btn-desktop-auto" type="button" aria-label="Adjust employee leave balance">
                 Adjust Leave Balance
               </button>
-              <button id="btnRefreshAdminLeaves" class="btn-secondary" type="button" aria-label="Refresh approval queues">
+              <button id="btnRefreshAdminLeaves" class="btn-secondary btn-desktop-auto" type="button" aria-label="Refresh approval queues">
                 Refresh Queues
               </button>
             </div>
@@ -1000,7 +1021,7 @@
           </div>
 
           <!-- Date Pickers Grid -->
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-grid-2">
             <div class="form-group">
               <label for="leaveStartDate" class="form-label">Start Date *</label>
               <input type="date" id="leaveStartDate" class="form-input" required>
@@ -1074,18 +1095,18 @@
           <strong>Anti-Self-Approval Safeguard:</strong> This is your personal leave application. You cannot approve or reject your own leave.
         </div>
 
-        <div style="background: var(--bg-app); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 16px; font-size: 13.5px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+        <div class="modal-summary-box">
+          <div class="modal-summary-row">
             <span><strong>Employee:</strong> <span id="revEmpName">—</span> (<span id="revEmpCode">—</span>)</span>
             <span><strong>Category:</strong> <span id="revCategory">—</span></span>
           </div>
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+          <div class="modal-summary-row">
             <span><strong>Dates:</strong> <span id="revDates">—</span></span>
             <span><strong>Charged:</strong> <strong id="revTotalDays">—</strong></span>
           </div>
           <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
             <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 2px;">REASON GIVEN:</div>
-            <div id="revReason" style="color: var(--text-main); font-style: italic;">—</div>
+            <div id="revReason" style="color: var(--text-main); font-style: italic; overflow-wrap: anywhere;">—</div>
           </div>
         </div>
 
@@ -1130,8 +1151,8 @@
           <strong>Anti-Self-Review Safeguard:</strong> This is your personal Comp-Off claim. You cannot review your own claim.
         </div>
 
-        <div style="background: var(--bg-app); padding: 14px 16px; border-radius: var(--radius-sm); border: 1px solid var(--border-color); margin-bottom: 16px; font-size: 13.5px;">
-          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+        <div class="modal-summary-box">
+          <div class="modal-summary-row">
             <span><strong>Employee:</strong> <span id="coRevEmpName">—</span> (<span id="coRevEmpCode">—</span>)</span>
             <span><strong>Work Date:</strong> <span id="coRevWorkDate">—</span></span>
           </div>
@@ -1140,7 +1161,7 @@
           </div>
           <div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-color);">
             <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 2px;">WORK DETAILS:</div>
-            <div id="coRevReason" style="color: var(--text-main); font-style: italic;">—</div>
+            <div id="coRevReason" style="color: var(--text-main); font-style: italic; overflow-wrap: anywhere;">—</div>
           </div>
         </div>
 
@@ -1194,7 +1215,7 @@
             </select>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-grid-2">
             <div class="form-group">
               <label for="adjCategorySelect" class="form-label">Leave Category *</label>
               <select id="adjCategorySelect" class="form-select" required>
@@ -1216,7 +1237,7 @@
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px;">
+          <div class="form-grid-2">
             <div class="form-group">
               <label for="adjYearInput" class="form-label">Calendar Year *</label>
               <input type="number" id="adjYearInput" class="form-input" min="2020" max="2100" required>
